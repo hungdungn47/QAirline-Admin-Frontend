@@ -1,0 +1,26 @@
+.light-small-text {
+  font-size: 16px;
+  font-weight: 200;
+  color: #240e45;
+}
+
+.medium-big-text {
+  font-size: 30px;
+  font-weight: 500;
+  color: #240e45;
+}
+
+.destination-code {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #69548d;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.flight-code {
+  font-size: 26px;
+  font-weight: 700;
+  color: #69548d;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}

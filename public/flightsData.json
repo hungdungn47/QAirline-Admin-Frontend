@@ -1,0 +1,74 @@
+[
+  {
+    "flightID": "FL001",
+    "departureTime": "2024-11-12T08:00:00",
+    "arrivalTime": "2024-11-12T10:30:00",
+    "originAirportCode": "JFK",
+    "destinationAirportCode": "LAX",
+    "availableSeats": 120,
+    "economyPrice": 200,
+    "businessPrice": 450,
+    "aircraftCode": "A320",
+    "arrangedBy": "Airline A"
+  },
+  {
+    "flightID": "FL002",
+    "departureTime": "2024-11-12T14:00:00",
+    "arrivalTime": "2024-11-12T16:45:00",
+    "originAirportCode": "ORD",
+    "destinationAirportCode": "DFW",
+    "availableSeats": 85,
+    "economyPrice": 180,
+    "businessPrice": 400,
+    "aircraftCode": "B737",
+    "arrangedBy": "Airline B"
+  },
+  {
+    "flightID": "FL003",
+    "departureTime": "2024-11-13T06:15:00",
+    "arrivalTime": "2024-11-13T09:00:00",
+    "originAirportCode": "SFO",
+    "destinationAirportCode": "SEA",
+    "availableSeats": 95,
+    "economyPrice": 150,
+    "businessPrice": 350,
+    "aircraftCode": "A319",
+    "arrangedBy": "Airline C"
+  },
+  {
+    "flightID": "FL004",
+    "departureTime": "2024-11-13T11:00:00",
+    "arrivalTime": "2024-11-13T13:45:00",
+    "originAirportCode": "LAX",
+    "destinationAirportCode": "DEN",
+    "availableSeats": 100,
+    "economyPrice": 220,
+    "businessPrice": 480,
+    "aircraftCode": "B757",
+    "arrangedBy": "Airline D"
+  },
+  {
+    "flightID": "FL005",
+    "departureTime": "2024-11-13T18:00:00",
+    "arrivalTime": "2024-11-13T21:30:00",
+    "originAirportCode": "ATL",
+    "destinationAirportCode": "MIA",
+    "availableSeats": 110,
+    "economyPrice": 175,
+    "businessPrice": 400,
+    "aircraftCode": "A321",
+    "arrangedBy": "Airline E"
+  },
+  {
+    "flightID": "FL006",
+    "departureTime": "2024-11-14T09:00:00",
+    "arrivalTime": "2024-11-14T11:30:00",
+    "originAirportCode": "BOS",
+    "destinationAirportCode": "PHL",
+    "availableSeats": 130,
+    "economyPrice": 160,
+    "businessPrice": 390,
+    "aircraftCode": "A320",
+    "arrangedBy": "Airline F"
+  }
+]
