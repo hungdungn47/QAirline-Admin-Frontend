@@ -3,7 +3,7 @@ import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import './flight_component.css'
 import formatDateTime from "../../utils/utils";
 
-export default function FlightComponent({ flight }) {
+export default function FlightComponent({ flight, setCurrentFlight }) {
   const departure = formatDateTime(flight.departureTime)
   const arrival = formatDateTime(flight.arrivalTime)
   const departureTime = departure.hour
@@ -17,8 +17,7 @@ export default function FlightComponent({ flight }) {
   return (
     <Box
       sx={{
-        cursor: 'pointer',
-        marginBottom: '20px',
+        marginBottom: '10px',
         borderRadius: '12px',
         boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.3)',
         display: 'flex',
@@ -77,7 +76,7 @@ export default function FlightComponent({ flight }) {
           <Typography>Aircraft: </Typography>
           <Typography color='primary' fontWeight='bold'>{aircraft}</Typography>
         </Box>
-        <Button variant='contained' size="small">Details</Button>
+        <Button onClick={() => setCurrentFlight(flight)} variant='contained' size="small">Details</Button>
       </Box>
     </Box>
   )
