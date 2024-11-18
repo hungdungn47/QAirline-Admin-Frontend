@@ -1,26 +1,45 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Layout from "./pages/Layout/Layout";
 import Flights from "./pages/Flights/Flights";
 import Tickets from "./pages/Tickets/Tickets";
 import Aircrafts from "./pages/Aircrafts/Aircrafts";
+import Login from "./pages/Auth/Login/Login";
+import Register from "./pages/Auth/Register/Register";
+
+const isAuthenticated = () => {
+  return localStorage.getItem("isAuthenticated") === "true";
+};
+
+function ProtectedRoute({ children }) {
+  return isAuthenticated() ? children : <Navigate to="/login" />;
+}
 
 function App() {
-
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout/>}>
-            <Route index element={<Home/>}/>
-            <Route path="flights" element={<Flights/>} />
-            <Route path="tickets" element={<Tickets/>}/>
-            <Route path="aircrafts" element={<Aircrafts/>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="flights" element={<Flights />} />
+            <Route path="tickets" element={<Tickets />} />
+            <Route path="aircrafts" element={<Aircrafts />} />
           </Route>
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -14,12 +14,10 @@ import { useState, useEffect } from "react";
 
 export default function FlightDetails({ flight }) {
   const flightID = flight.flightID;
-  const departure = formatDateTime(flight.departureTime);
-  const arrival = formatDateTime(flight.arrivalTime);
-  const departureTime = departure.hour;
-  const departureDate = departure.date;
-  const arrivalTime = arrival.hour;
-  const arrivalDate = arrival.date;
+  const [departureTime, setDepartureTime] = useState(
+    new Date(flight.departureTime)
+  );
+  const [arrivalTime, setArrivalTime] = useState(new Date(flight.arrivalTime));
   const destination = flight.destinationAirportCode;
   const origin = flight.originAirportCode;
 
@@ -41,8 +39,9 @@ export default function FlightDetails({ flight }) {
   const [isDelaying, setIsDelaying] = useState(false);
   const [delayTime, setDelayTime] = useState(0);
 
-  // Sync input fields when flight data changes
   useEffect(() => {
+    setDepartureTime(new Date(flight.departureTime));
+    setArrivalTime(new Date(flight.arrivalTime));
     setAircraft(flight.aircraftCode);
     setEconomyPrice(flight.economyPrice);
     setBusinessPrice(flight.businessPrice);
@@ -64,9 +63,23 @@ export default function FlightDetails({ flight }) {
   };
 
   const applyDelay = () => {
-    console.log(`Flight delayed by ${delayTime} hours`);
-    setIsDelaying(false);
-    // Add logic to update the delayed flight time if needed
+    if (delayTime > 0) {
+      const newDepartureTime = new Date(departureTime);
+      newDepartureTime.setHours(
+        newDepartureTime.getHours() + parseInt(delayTime, 10)
+      );
+      setDepartureTime(newDepartureTime);
+
+      // Optionally update the arrival time similarly (example assumes same delay for simplicity)
+      const newArrivalTime = new Date(arrivalTime);
+      newArrivalTime.setHours(
+        newArrivalTime.getHours() + parseInt(delayTime, 10)
+      );
+      setArrivalTime(newArrivalTime);
+
+      setIsDelaying(false);
+      console.log(`Flight delayed by ${delayTime} hours`);
+    }
   };
 
   return (
@@ -91,16 +104,24 @@ export default function FlightDetails({ flight }) {
       >
         <Box sx={{ textAlign: "start" }}>
           <div className="destination-code">{origin}</div>
-          <div className="medium-big-text">{departureTime}</div>
-          <div className="light-small-text">{departureDate}</div>
+          <div className="medium-big-text">
+            {departureTime.toLocaleTimeString()}
+          </div>
+          <div className="light-small-text">
+            {departureTime.toLocaleDateString()}
+          </div>
         </Box>
         <Box>
           <ConnectingAirportsIcon fontSize="large" color="primary" />
         </Box>
         <Box sx={{ textAlign: "end" }}>
           <div className="destination-code">{destination}</div>
-          <div className="medium-big-text">{arrivalTime}</div>
-          <div className="light-small-text">{arrivalDate}</div>
+          <div className="medium-big-text">
+            {arrivalTime.toLocaleTimeString()}
+          </div>
+          <div className="light-small-text">
+            {arrivalTime.toLocaleDateString()}
+          </div>
         </Box>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -188,6 +209,35 @@ export default function FlightDetails({ flight }) {
           </Button>
         </Box>
       )}
+      {isDelaying && (
+        <Box sx={{ marginTop: "20px", display: "flex", gap: 2 }}>
+          <TextField
+            label="Delay (hours)"
+            type="number"
+            value={delayTime}
+            onChange={(e) => setDelayTime(e.target.value)}
+            sx={{ flex: 2 }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={applyDelay}
+            sx={{ flex: 1 }}
+          >
+            Apply
+          </Button>
+          <Button
+            variant="outlined"
+            color="warning"
+            onClick={() => {
+              setIsDelaying(false);
+            }}
+            sx={{ flex: 1.2 }}
+          >
+            Cancel delay
+          </Button>
+        </Box>
+      )}
       <Divider
         sx={{ marginTop: "10px", border: "0.8px solid rgb(200, 200, 200)" }}
       />
@@ -206,29 +256,15 @@ export default function FlightDetails({ flight }) {
         >
           Delay
         </Button>
-        <Button sx={{ flex: 1 }} variant="outlined" color="error">
+        <Button
+          sx={{ flex: 1 }}
+          variant="outlined"
+          color="error"
+          onClick={() => {}}
+        >
           Cancel
         </Button>
       </Box>
-      {isDelaying && (
-        <Box sx={{ marginTop: "20px", display: "flex", gap: 2 }}>
-          <TextField
-            label="Delay (hours)"
-            type="number"
-            value={delayTime}
-            onChange={(e) => setDelayTime(e.target.value)}
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={applyDelay}
-            sx={{ flex: 1 }}
-          >
-            Apply Delay
-          </Button>
-        </Box>
-      )}
     </Box>
   );
 }

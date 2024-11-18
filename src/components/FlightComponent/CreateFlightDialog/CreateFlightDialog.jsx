@@ -24,13 +24,30 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
     arrangedBy: "",
   });
 
+  const [errors, setErrors] = useState({}); // State to track validation errors
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFlightData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear error on change
+  };
+
+  const validateFields = () => {
+    const newErrors = {};
+    Object.keys(flightData).forEach((key) => {
+      if (!flightData[key]) {
+        newErrors[key] = "This field is required.";
+      }
+    });
+    return newErrors;
   };
 
   const handleCreate = () => {
-    // Validate data (optional)
+    const validationErrors = validateFields();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     onCreate(flightData);
     onClose();
   };
@@ -53,6 +70,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.flightID}
             onChange={handleChange}
             fullWidth
+            error={!!errors.flightID}
+            helperText={errors.flightID}
           />
           <TextField
             label="Departure Time"
@@ -62,6 +81,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             onChange={handleChange}
             fullWidth
             InputLabelProps={{ shrink: true }}
+            error={!!errors.departureTime}
+            helperText={errors.departureTime}
           />
           <TextField
             label="Arrival Time"
@@ -71,6 +92,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             onChange={handleChange}
             fullWidth
             InputLabelProps={{ shrink: true }}
+            error={!!errors.arrivalTime}
+            helperText={errors.arrivalTime}
           />
           <TextField
             label="Origin Airport Code"
@@ -78,6 +101,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.originAirportCode}
             onChange={handleChange}
             fullWidth
+            error={!!errors.originAirportCode}
+            helperText={errors.originAirportCode}
           />
           <TextField
             label="Destination Airport Code"
@@ -85,6 +110,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.destinationAirportCode}
             onChange={handleChange}
             fullWidth
+            error={!!errors.destinationAirportCode}
+            helperText={errors.destinationAirportCode}
           />
           <TextField
             label="Available Seats"
@@ -93,6 +120,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.availableSeats}
             onChange={handleChange}
             fullWidth
+            error={!!errors.availableSeats}
+            helperText={errors.availableSeats}
           />
           <TextField
             label="Economy Price"
@@ -101,6 +130,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.economyPrice}
             onChange={handleChange}
             fullWidth
+            error={!!errors.economyPrice}
+            helperText={errors.economyPrice}
           />
           <TextField
             label="Business Price"
@@ -109,6 +140,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.businessPrice}
             onChange={handleChange}
             fullWidth
+            error={!!errors.businessPrice}
+            helperText={errors.businessPrice}
           />
           <TextField
             label="Aircraft Code"
@@ -117,6 +150,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             onChange={handleChange}
             select
             fullWidth
+            error={!!errors.aircraftCode}
+            helperText={errors.aircraftCode}
           >
             <MenuItem value="A319">A319</MenuItem>
             <MenuItem value="A320">A320</MenuItem>
@@ -128,6 +163,8 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             value={flightData.arrangedBy}
             onChange={handleChange}
             fullWidth
+            error={!!errors.arrangedBy}
+            helperText={errors.arrangedBy}
           />
         </Box>
       </DialogContent>

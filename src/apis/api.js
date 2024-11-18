@@ -18,4 +18,15 @@ export const getFlightsData = async () => {
   }
 };
 
+export const fetchAircrafts = async () => {
+  try {
+    const response = await axios.get("/aircraftsData.json");
+    console.log(response.data);
+    return response.data; // Return aircraft data
+  } catch (error) {
+    console.error("Error fetching aircraft data:", error);
+    throw error;
+  }
+};
+
 export default api;
