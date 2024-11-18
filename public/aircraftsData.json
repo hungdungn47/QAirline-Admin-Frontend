@@ -1,0 +1,5 @@
+[
+  { "id": "A319", "brand": "Airbus", "model": "A319" },
+  { "id": "B737", "brand": "Boeing", "model": "737-800" },
+  { "id": "CRJ", "brand": "Bombardier", "model": "CRJ700" }
+]
