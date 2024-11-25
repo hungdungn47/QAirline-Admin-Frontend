@@ -4,6 +4,7 @@ import Layout from "./pages/Layout/Layout";
 import Flights from "./pages/Flights/Flights";
 import Tickets from "./pages/Tickets/Tickets";
 import Aircrafts from "./pages/Aircrafts/Aircrafts";
+import News from "./pages/News/News";
 import Login from "./pages/Auth/Login/Login";
 import Register from "./pages/Auth/Register/Register";
 
@@ -34,6 +35,7 @@ function App() {
             <Route path="flights" element={<Flights />} />
             <Route path="tickets" element={<Tickets />} />
             <Route path="aircrafts" element={<Aircrafts />} />
+            <Route path="news" element={<News />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
