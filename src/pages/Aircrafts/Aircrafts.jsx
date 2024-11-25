@@ -33,6 +33,7 @@ export default function Aircrafts() {
   const [selectedAircraft, setSelectedAircraft] = useState(null);
   const [formData, setFormData] = useState({ id: "", brand: "", model: "" });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadAircrafts = async () => {
@@ -40,7 +41,7 @@ export default function Aircrafts() {
         const data = await fetchAircrafts();
         setAircrafts(data);
       } catch (err) {
-        setError("Failed to load aircraft data.");
+        setErrors("Failed to load aircraft data.");
       } finally {
         setLoading(false);
       }

@@ -29,4 +29,15 @@ export const fetchAircrafts = async () => {
   }
 };
 
+export const fetchNewsApi = async () => {
+  try {
+    const response = await axios.get("/newsData.json");
+    console.log(response.data);
+    return response.data; // Return aircraft data
+  } catch (error) {
+    console.error("Error fetching news data:", error);
+    throw error;
+  }
+};
+
 export default api;

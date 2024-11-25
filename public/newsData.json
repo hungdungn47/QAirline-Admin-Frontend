@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "title": "New Direct Flights to Europe Announced",
+    "content": "Our airline is introducing direct flights to several popular European destinations starting next month. Enjoy seamless travel with our award-winning service.",
+    "category": "Travel Updates",
+    "date": "2024-12-01"
+  },
+  {
+    "id": 2,
+    "title": "Holiday Travel Advisory",
+    "content": "Due to increased holiday travel, we recommend arriving at the airport at least 3 hours before your flight. Check our website for real-time updates.",
+    "category": "Advisory",
+    "date": "2024-11-25"
+  },
+  {
+    "id": 3,
+    "title": "Introducing Premium Economy Class",
+    "content": "Our new Premium Economy Class offers extra legroom, upgraded meals, and priority boarding on select routes. Book now to experience unparalleled comfort.",
+    "category": "Announcements",
+    "date": "2024-10-15"
+  },
+  {
+    "id": 4,
+    "title": "Award-Winning In-Flight Services",
+    "content": "We are proud to receive the Best Airline Service Award for the third year in a row. Thank you for choosing us!",
+    "category": "Recognition",
+    "date": "2024-09-10"
+  },
+  {
+    "id": 5,
+    "title": "Travel Green with Us",
+    "content": "Join our sustainability initiative with carbon-neutral flights and eco-friendly practices. Together, we can make a difference for the planet.",
+    "category": "Sustainability",
+    "date": "2024-08-20"
+  }
+]
