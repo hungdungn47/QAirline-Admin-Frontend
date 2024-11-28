@@ -9,7 +9,10 @@ import Login from "./pages/Auth/Login/Login";
 import Register from "./pages/Auth/Register/Register";
 
 const isAuthenticated = () => {
-  return localStorage.getItem("isAuthenticated") === "true";
+  return (
+    localStorage.getItem("accessToken") !== undefined &&
+    localStorage.getItem("accessToken") !== null
+  );
 };
 
 function ProtectedRoute({ children }) {
@@ -37,7 +40,7 @@ function App() {
             <Route path="aircrafts" element={<Aircrafts />} />
             <Route path="news" element={<News />} />
           </Route>
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </BrowserRouter>
     </>

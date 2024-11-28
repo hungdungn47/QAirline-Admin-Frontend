@@ -8,16 +8,21 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import formatDateTime from "../../utils/utils";
 import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import { useState, useEffect } from "react";
+import { parse, format, addHours } from "date-fns";
 
 export default function FlightDetails({ flight }) {
   const flightID = flight.flightID;
+  const parseDateTime = (dateTimeString) => {
+    return parse(dateTimeString, "dd/MM/yyyy HH:mm:ss", new Date());
+  };
   const [departureTime, setDepartureTime] = useState(
-    new Date(flight.departureTime)
+    parseDateTime(flight.departureTime)
   );
-  const [arrivalTime, setArrivalTime] = useState(new Date(flight.arrivalTime));
+  const [arrivalTime, setArrivalTime] = useState(
+    parseDateTime(flight.arrivalTime)
+  );
   const destination = flight.destinationAirportCode;
   const origin = flight.originAirportCode;
 
@@ -40,8 +45,8 @@ export default function FlightDetails({ flight }) {
   const [delayTime, setDelayTime] = useState(0);
 
   useEffect(() => {
-    setDepartureTime(new Date(flight.departureTime));
-    setArrivalTime(new Date(flight.arrivalTime));
+    setDepartureTime(parseDateTime(flight.departureTime));
+    setArrivalTime(parseDateTime(flight.arrivalTime));
     setAircraft(flight.aircraftCode);
     setEconomyPrice(flight.economyPrice);
     setBusinessPrice(flight.businessPrice);
@@ -62,19 +67,32 @@ export default function FlightDetails({ flight }) {
     setIsEditing(false);
   };
 
+  // const applyDelay = () => {
+  //   if (delayTime > 0) {
+  //     const newDepartureTime = new Date(departureTime);
+  //     newDepartureTime.setHours(
+  //       newDepartureTime.getHours() + parseInt(delayTime, 10)
+  //     );
+  //     setDepartureTime(newDepartureTime);
+
+  //     // Optionally update the arrival time similarly (example assumes same delay for simplicity)
+  //     const newArrivalTime = new Date(arrivalTime);
+  //     newArrivalTime.setHours(
+  //       newArrivalTime.getHours() + parseInt(delayTime, 10)
+  //     );
+  //     setArrivalTime(newArrivalTime);
+
+  //     setIsDelaying(false);
+  //     console.log(`Flight delayed by ${delayTime} hours`);
+  //   }
+  // };
+
   const applyDelay = () => {
     if (delayTime > 0) {
-      const newDepartureTime = new Date(departureTime);
-      newDepartureTime.setHours(
-        newDepartureTime.getHours() + parseInt(delayTime, 10)
-      );
+      const newDepartureTime = addHours(departureTime, parseInt(delayTime, 10));
       setDepartureTime(newDepartureTime);
 
-      // Optionally update the arrival time similarly (example assumes same delay for simplicity)
-      const newArrivalTime = new Date(arrivalTime);
-      newArrivalTime.setHours(
-        newArrivalTime.getHours() + parseInt(delayTime, 10)
-      );
+      const newArrivalTime = addHours(arrivalTime, parseInt(delayTime, 10));
       setArrivalTime(newArrivalTime);
 
       setIsDelaying(false);
@@ -105,10 +123,10 @@ export default function FlightDetails({ flight }) {
         <Box sx={{ textAlign: "start" }}>
           <div className="destination-code">{origin}</div>
           <div className="medium-big-text">
-            {departureTime.toLocaleTimeString()}
+            {format(departureTime, "HH:mm:ss")}
           </div>
           <div className="light-small-text">
-            {departureTime.toLocaleDateString()}
+            {format(departureTime, "dd/MM/yyyy")}
           </div>
         </Box>
         <Box>
@@ -117,10 +135,10 @@ export default function FlightDetails({ flight }) {
         <Box sx={{ textAlign: "end" }}>
           <div className="destination-code">{destination}</div>
           <div className="medium-big-text">
-            {arrivalTime.toLocaleTimeString()}
+            {format(departureTime, "HH:mm:ss")}
           </div>
           <div className="light-small-text">
-            {arrivalTime.toLocaleDateString()}
+            {format(departureTime, "dd/MM/yyyy")}
           </div>
         </Box>
       </Box>

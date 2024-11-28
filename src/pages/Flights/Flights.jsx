@@ -72,7 +72,7 @@ export default function Flights() {
           {flights.map((flight) => {
             return (
               <FlightComponent
-                key={flight.flightID}
+                // key={flight.flightNumber}
                 setCurrentFlight={setCurrentFlight}
                 flight={flight}
               />
