@@ -17,39 +17,41 @@ import {
   TextField,
 } from "@mui/material";
 
-import { fetchAircrafts } from "../../apis/api";
-
-// Mock initial data
-// const initialAircrafts = [
-//   { id: "A319", brand: "Airbus", model: "A319" },
-//   { id: "B737", brand: "Boeing", model: "737-800" },
-//   { id: "CRJ", brand: "Bombardier", model: "CRJ700" },
-// ];
+import {
+  createAircraft,
+  deleteAircraft,
+  fetchAircrafts,
+  updateAircraft,
+} from "../../apis/api";
 
 export default function Aircrafts() {
   const [aircrafts, setAircrafts] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedAircraft, setSelectedAircraft] = useState(null);
-  const [formData, setFormData] = useState({ id: "", brand: "", model: "" });
+  const [formData, setFormData] = useState({
+    brand: "",
+    model: "",
+    numOfEconomySeats: 0,
+    numOfBusinessSeats: 0,
+  });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
-
+  const loadAircrafts = async () => {
+    try {
+      const data = await fetchAircrafts();
+      setAircrafts(data);
+    } catch (err) {
+      setErrors("Failed to load aircraft data.");
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const loadAircrafts = async () => {
-      try {
-        const data = await fetchAircrafts();
-        setAircrafts(data);
-      } catch (err) {
-        setErrors("Failed to load aircraft data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadAircrafts();
   }, []);
   // Handle form input changes
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -59,14 +61,13 @@ export default function Aircrafts() {
   // Validate form
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.id) newErrors.id = "ID is required.";
     if (!formData.brand) newErrors.brand = "Brand is required.";
     if (!formData.model) newErrors.model = "Model is required.";
     return newErrors;
   };
 
   // Handle add or update
-  const handleSave = () => {
+  const handleSave = async () => {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -75,14 +76,18 @@ export default function Aircrafts() {
 
     if (editMode) {
       // Update aircraft
-      setAircrafts((prev) =>
-        prev.map((aircraft) =>
-          aircraft.id === selectedAircraft.id ? formData : aircraft
-        )
-      );
+      // setAircrafts((prev) =>
+      //   prev.map((aircraft) =>
+      //     aircraft.id === selectedAircraft.id ? formData : aircraft
+      //   )
+      // );
+      updateAircraft({ ...formData, id: selectedAircraft.id }).then((res) => {
+        loadAircrafts();
+      });
     } else {
-      // Create new aircraft
-      setAircrafts((prev) => [...prev, formData]);
+      createAircraft(formData).then((res) => {
+        loadAircrafts();
+      });
     }
 
     handleCloseDialog();
@@ -92,14 +97,26 @@ export default function Aircrafts() {
   const handleOpenDialog = (aircraft = null) => {
     setEditMode(!!aircraft);
     setSelectedAircraft(aircraft);
-    setFormData(aircraft || { id: "", brand: "", model: "" });
+    setFormData(
+      aircraft || {
+        brand: "",
+        model: "",
+        numOfEconomySeats: 0,
+        numOfBusinessSeats: 0,
+      }
+    );
     setOpenDialog(true);
   };
 
   // Close dialog
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setFormData({ id: "", brand: "", model: "" });
+    setFormData({
+      brand: "",
+      model: "",
+      numOfEconomySeats: 0,
+      numOfBusinessSeats: 0,
+    });
     setSelectedAircraft(null);
     setErrors({});
   };
@@ -107,6 +124,9 @@ export default function Aircrafts() {
   // Delete aircraft
   const handleDelete = (id) => {
     setAircrafts((prev) => prev.filter((aircraft) => aircraft.id !== id));
+    deleteAircraft(id).then((res) => {
+      loadAircrafts();
+    });
   };
 
   return (
@@ -129,6 +149,8 @@ export default function Aircrafts() {
               <TableCell>ID</TableCell>
               <TableCell>Brand</TableCell>
               <TableCell>Model</TableCell>
+              <TableCell>Economy seats</TableCell>
+              <TableCell>Business seats</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -138,6 +160,8 @@ export default function Aircrafts() {
                 <TableCell>{aircraft.id}</TableCell>
                 <TableCell>{aircraft.brand}</TableCell>
                 <TableCell>{aircraft.model}</TableCell>
+                <TableCell>{aircraft.numOfEconomySeats}</TableCell>
+                <TableCell>{aircraft.numOfBusinessSeats}</TableCell>
                 <TableCell>
                   <Button
                     color="primary"
@@ -164,16 +188,6 @@ export default function Aircrafts() {
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             <TextField
-              label="ID"
-              name="id"
-              value={formData.id}
-              onChange={handleChange}
-              fullWidth
-              error={!!errors.id}
-              helperText={errors.id}
-              disabled={editMode} // Disable editing ID
-            />
-            <TextField
               label="Brand"
               name="brand"
               value={formData.brand}
@@ -190,6 +204,24 @@ export default function Aircrafts() {
               fullWidth
               error={!!errors.model}
               helperText={errors.model}
+            />
+            <TextField
+              label="Economy seats"
+              name="numOfEconomySeats"
+              value={formData.numOfEconomySeats}
+              onChange={handleChange}
+              fullWidth
+              error={!!errors.numOfEconomySeats}
+              helperText={errors.numOfEconomySeats}
+            />
+            <TextField
+              label="Business seats"
+              name="numOfBusinessSeats"
+              value={formData.numOfBusinessSeats}
+              onChange={handleChange}
+              fullWidth
+              error={!!errors.numOfBusinessSeats}
+              helperText={errors.numOfBusinessSeats}
             />
           </Box>
         </DialogContent>
