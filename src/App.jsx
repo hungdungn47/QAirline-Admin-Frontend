@@ -7,6 +7,8 @@ import Aircrafts from "./pages/Aircrafts/Aircrafts";
 import News from "./pages/News/News";
 import Login from "./pages/Auth/Login/Login";
 import Register from "./pages/Auth/Register/Register";
+import ForgetPassword from "./pages/Auth/ForgetPassword/ForgetPassword";
+import ResetPassword from "./pages/Auth/ForgetPassword/ResetPassword";
 
 const isAuthenticated = () => {
   return (
@@ -25,6 +27,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgetPassword" element={<ForgetPassword />} />
+          <Route path="/resetPassword" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"

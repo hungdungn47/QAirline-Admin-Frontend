@@ -1,10 +1,13 @@
 import FlightComponent from "../../components/FlightComponent/FlightComponent";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { useState } from "react";
-import { getFlightsData } from "../../apis/api";
+import { fetchAircrafts, fetchAirports, getFlightsData } from "../../apis/api";
 import { useEffect } from "react";
 import FlightDetails from "../../components/FlightComponent/FlightDetails";
 import CreateFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateFlightDialog";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { fromDateTimeLocalFormat } from "../../utils/utils";
 
 export default function Flights() {
   const [flights, setFlights] = useState([]);
@@ -12,18 +15,43 @@ export default function Flights() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [aircrafts, setAircrafts] = useState([]);
+  const [airports, setAirports] = useState([]);
+
   const handleCreate = (flight) => {
-    console.log("New Flight Data:", flight);
+    const formattedData = {
+      ...flight,
+      departureTime: fromDateTimeLocalFormat(flight.departureTime),
+      arrivalTime: fromDateTimeLocalFormat(flight.arrivalTime),
+    };
+    console.log("New Flight Data:", formattedData);
     // Add logic to save the flight
   };
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getFlightsData();
-        console.log("Data: ", data);
-        setFlights(data);
-        setCurrentFlight(data[0]);
+        const flightData = await getFlightsData();
+        toast.success("Fetched flights!");
+        setFlights(flightData);
+        setCurrentFlight(flightData[0]);
+        fetchAircrafts()
+          .then((data) => {
+            setAircrafts(data);
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error(error);
+          });
+
+        fetchAirports()
+          .then((data) => {
+            setAirports(data);
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error(error);
+          });
       } catch (err) {
         setError("Failed to fetch flights data.");
       } finally {
@@ -102,7 +130,10 @@ export default function Flights() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onCreate={handleCreate}
+        aircrafts={aircrafts}
+        airports={airports}
       />
+      <ToastContainer />
     </Box>
   );
 }

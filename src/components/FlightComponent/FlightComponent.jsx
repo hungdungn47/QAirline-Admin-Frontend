@@ -1,7 +1,7 @@
 import { Box, Divider, Typography, Button } from "@mui/material";
 import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import "./flight_component.css";
-import formatDateTime from "../../utils/utils";
+import { getHourAndDate } from "../../utils/utils";
 
 export default function FlightComponent({ flight, setCurrentFlight }) {
   const {
@@ -14,10 +14,10 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
     plane,
   } = {
     ...flight,
-    departureHour: formatDateTime(flight.departureTime).hour,
-    departureDate: formatDateTime(flight.departureTime).date,
-    arrivalHour: formatDateTime(flight.arrivalTime).hour,
-    arrivalDate: formatDateTime(flight.arrivalTime).date,
+    departureHour: getHourAndDate(flight.departureTime).hour,
+    departureDate: getHourAndDate(flight.departureTime).date,
+    arrivalHour: getHourAndDate(flight.arrivalTime).hour,
+    arrivalDate: getHourAndDate(flight.arrivalTime).date,
   };
 
   return (

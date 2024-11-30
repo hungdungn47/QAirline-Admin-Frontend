@@ -89,6 +89,7 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
           />
+          <Link to="/forgetPassword">Forgot password?</Link>
           <Button
             variant="contained"
             color="primary"

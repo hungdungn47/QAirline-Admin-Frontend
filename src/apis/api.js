@@ -62,6 +62,24 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+export const createFlight = async (data) => {
+  try {
+    const response = await apiClient.post("/api/admin/v1/flights", data);
+    return response.data.results;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateFlight = async (data) => {
+  try {
+    const response = await apiClient.put("/api/admin/v1/flights", data);
+    return response.data.results;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const getFlightsData = async () => {
   try {
     const response = await apiClient.get("/api/admin/v1/flights");
@@ -112,6 +130,16 @@ export const deleteAircraft = async (id) => {
     return response.data.message;
   } catch (error) {
     console.error("Error deleting aircraft", error);
+    throw error;
+  }
+};
+
+export const fetchAirports = async () => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/airports");
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching airports data:", error);
     throw error;
   }
 };

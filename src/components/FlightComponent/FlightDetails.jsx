@@ -123,7 +123,7 @@ export default function FlightDetails({ flight }) {
         <Box sx={{ textAlign: "start" }}>
           <div className="destination-code">{origin}</div>
           <div className="medium-big-text">
-            {format(departureTime, "HH:mm:ss")}
+            {format(departureTime, "HH:mm")}
           </div>
           <div className="light-small-text">
             {format(departureTime, "dd/MM/yyyy")}
@@ -135,7 +135,7 @@ export default function FlightDetails({ flight }) {
         <Box sx={{ textAlign: "end" }}>
           <div className="destination-code">{destination}</div>
           <div className="medium-big-text">
-            {format(departureTime, "HH:mm:ss")}
+            {format(departureTime, "HH:mm")}
           </div>
           <div className="light-small-text">
             {format(departureTime, "dd/MM/yyyy")}

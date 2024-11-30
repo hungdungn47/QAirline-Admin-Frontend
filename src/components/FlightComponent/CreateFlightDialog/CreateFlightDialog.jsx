@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,19 +10,34 @@ import {
   Box,
 } from "@mui/material";
 
-export default function CreateFlightDialog({ open, onClose, onCreate }) {
+export default function CreateFlightDialog({
+  open,
+  onClose,
+  onCreate,
+  aircrafts,
+  airports,
+}) {
   const [flightData, setFlightData] = useState({
-    flightID: "",
     departureTime: "",
     arrivalTime: "",
-    originAirportCode: "",
-    destinationAirportCode: "",
-    availableSeats: "",
-    economyPrice: "",
-    businessPrice: "",
-    aircraftCode: "",
-    arrangedBy: "",
+    originAirport: "",
+    destinationAirport: "",
+    economyPrice: 150,
+    businessPrice: 250,
+    aircraft: "",
   });
+
+  const resetForm = () => {
+    setFlightData({
+      departureTime: "",
+      arrivalTime: "",
+      originAirport: "",
+      destinationAirport: "",
+      economyPrice: 150,
+      businessPrice: 250,
+      aircraft: "",
+    });
+  };
 
   const [errors, setErrors] = useState({}); // State to track validation errors
 
@@ -53,7 +68,15 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={() => {
+        resetForm();
+        onClose();
+      }}
+      maxWidth="sm"
+      fullWidth
+    >
       <DialogTitle>Create New Flight</DialogTitle>
       <DialogContent>
         <Box
@@ -64,15 +87,6 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             marginTop: 2,
           }}
         >
-          <TextField
-            label="Flight ID"
-            name="flightID"
-            value={flightData.flightID}
-            onChange={handleChange}
-            fullWidth
-            error={!!errors.flightID}
-            helperText={errors.flightID}
-          />
           <TextField
             label="Departure Time"
             name="departureTime"
@@ -96,33 +110,41 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             helperText={errors.arrivalTime}
           />
           <TextField
-            label="Origin Airport Code"
-            name="originAirportCode"
-            value={flightData.originAirportCode}
+            label="Origin Airport "
+            name="originAirport"
+            value={flightData.originAirport}
             onChange={handleChange}
+            select
             fullWidth
-            error={!!errors.originAirportCode}
-            helperText={errors.originAirportCode}
-          />
+            error={!!errors.originAirport}
+            helperText={errors.originAirport}
+          >
+            {airports.map((airport) => {
+              return (
+                <MenuItem key={airport.id} value={airport.id}>
+                  {airport.airportName}
+                </MenuItem>
+              );
+            })}
+          </TextField>
           <TextField
-            label="Destination Airport Code"
-            name="destinationAirportCode"
-            value={flightData.destinationAirportCode}
+            label="Destination Airport "
+            name="destinationAirport"
+            value={flightData.destinationAirport}
             onChange={handleChange}
+            select
             fullWidth
-            error={!!errors.destinationAirportCode}
-            helperText={errors.destinationAirportCode}
-          />
-          <TextField
-            label="Available Seats"
-            name="availableSeats"
-            type="number"
-            value={flightData.availableSeats}
-            onChange={handleChange}
-            fullWidth
-            error={!!errors.availableSeats}
-            helperText={errors.availableSeats}
-          />
+            error={!!errors.destinationAirport}
+            helperText={errors.destinationAirport}
+          >
+            {airports.map((airport) => {
+              return (
+                <MenuItem key={airport.id} value={airport.id}>
+                  {airport.airportName}
+                </MenuItem>
+              );
+            })}
+          </TextField>
           <TextField
             label="Economy Price"
             name="economyPrice"
@@ -144,35 +166,46 @@ export default function CreateFlightDialog({ open, onClose, onCreate }) {
             helperText={errors.businessPrice}
           />
           <TextField
-            label="Aircraft Code"
-            name="aircraftCode"
-            value={flightData.aircraftCode}
+            label="Aircraft"
+            name="aircraft"
+            value={flightData.aircraft}
             onChange={handleChange}
             select
             fullWidth
-            error={!!errors.aircraftCode}
-            helperText={errors.aircraftCode}
+            error={!!errors.aircraft}
+            helperText={errors.aircraft}
           >
             <MenuItem value="A319">A319</MenuItem>
             <MenuItem value="A320">A320</MenuItem>
             <MenuItem value="B737">B737</MenuItem>
+            {aircrafts.map((aircraft) => {
+              return (
+                <MenuItem key={aircraft.id} value={aircraft.id}>
+                  {aircraft.brand} {aircraft.model}
+                </MenuItem>
+              );
+            })}
           </TextField>
-          <TextField
-            label="Arranged By"
-            name="arrangedBy"
-            value={flightData.arrangedBy}
-            onChange={handleChange}
-            fullWidth
-            error={!!errors.arrangedBy}
-            helperText={errors.arrangedBy}
-          />
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button
+          onClick={() => {
+            resetForm();
+            onClose();
+          }}
+          color="secondary"
+        >
           Cancel
         </Button>
-        <Button onClick={handleCreate} variant="contained" color="primary">
+        <Button
+          onClick={() => {
+            resetForm();
+            handleCreate();
+          }}
+          variant="contained"
+          color="primary"
+        >
           Create
         </Button>
       </DialogActions>
