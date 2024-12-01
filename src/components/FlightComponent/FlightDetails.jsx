@@ -10,21 +10,38 @@ import {
 } from "@mui/material";
 import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import { useState, useEffect } from "react";
-import { parse, format, addHours } from "date-fns";
+import { parse, format, addHours, differenceInHours } from "date-fns";
+import {
+  changeFlightAircraft,
+  delayFlight,
+  getFlightById,
+  getFlightsData,
+} from "../../apis/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { parseDateTime } from "../../utils/utils";
 
-export default function FlightDetails({ flight, aircrafts }) {
-  const flightID = flight.flightID;
-  const parseDateTime = (dateTimeString) => {
-    return parse(dateTimeString, "dd/MM/yyyy HH:mm:ss", new Date());
-  };
-  const [departureTime, setDepartureTime] = useState(
-    parseDateTime(flight.departureTime)
-  );
-  const [arrivalTime, setArrivalTime] = useState(
-    parseDateTime(flight.arrivalTime)
-  );
-  const destination = flight.destinationAirport;
-  const origin = flight.originAirport;
+export default function FlightDetails({ setFlights, flightData, aircrafts }) {
+  const [flight, setFlight] = useState(flightData);
+
+  let initialDepartureTime = flight.delayedDepartureTime
+    ? parseDateTime(flight.delayedDepartureTime)
+    : parseDateTime(flight.departureTime);
+  const [departureTime, setDepartureTime] = useState(initialDepartureTime);
+
+  let initialArrivalTime = flight.delayedDepartureTime
+    ? addHours(
+        parseDateTime(flight.arrivalTime),
+        differenceInHours(
+          parseDateTime(flight.delayedDepartureTime),
+          parseDateTime(flight.departureTime)
+        )
+      )
+    : parseDateTime(flight.arrivalTime);
+  const [arrivalTime, setArrivalTime] = useState(initialArrivalTime);
+
+  const destination = flight.destinationAirport.airportCode;
+  const origin = flight.originAirport.airportCode;
   const economyPrice = flight.economyPrice;
   const businessPrice = flight.businessPrice;
   const [aircraft, setAircraft] = useState(flight.plane.id);
@@ -37,9 +54,18 @@ export default function FlightDetails({ flight, aircrafts }) {
   const [isDelaying, setIsDelaying] = useState(false);
   const [delayTime, setDelayTime] = useState(0);
 
+  const fetchFlightData = async () => {
+    const data = await getFlightById(flightData.id);
+    setFlight(data);
+  };
+
   useEffect(() => {
-    setDepartureTime(parseDateTime(flight.departureTime));
-    setArrivalTime(parseDateTime(flight.arrivalTime));
+    setFlight(flightData);
+  }, [flightData]);
+
+  useEffect(() => {
+    setDepartureTime(initialDepartureTime);
+    setArrivalTime(initialArrivalTime);
     setAircraft(flight.plane.id);
 
     // Reset inputs when the flight changes
@@ -57,13 +83,25 @@ export default function FlightDetails({ flight, aircrafts }) {
   const applyDelay = () => {
     if (delayTime > 0) {
       const newDepartureTime = addHours(departureTime, parseInt(delayTime, 10));
-      setDepartureTime(newDepartureTime);
-
       const newArrivalTime = addHours(arrivalTime, parseInt(delayTime, 10));
-      setArrivalTime(newArrivalTime);
 
-      setIsDelaying(false);
-      console.log(`Flight delayed by ${delayTime} hours`);
+      delayFlight(flight.id, format(newDepartureTime, "dd/MM/yyyy HH:mm:ss"))
+        .then((message) => {
+          setDepartureTime(newDepartureTime);
+          setArrivalTime(newArrivalTime);
+
+          setIsDelaying(false);
+          fetchFlightData();
+          getFlightsData().then((res) => {
+            setFlights(res);
+          });
+          toast.success(message);
+        })
+        .catch((err) => {
+          toast.error(err);
+        });
+
+      // console.log(`Flight delayed by ${delayTime} hours`);
     }
   };
 
@@ -76,7 +114,7 @@ export default function FlightDetails({ flight, aircrafts }) {
       }}
     >
       <Typography fontSize="24px" color="primary">
-        {flightID}
+        {flight.flightNumber}
       </Typography>
       <Box
         sx={{
@@ -109,7 +147,22 @@ export default function FlightDetails({ flight, aircrafts }) {
           </div>
         </Box>
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      {flight.delayedDepartureTime ? (
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <Typography>Delayed until: </Typography>
+            <Typography color="primary" fontWeight="bold" fontSize="20px">
+              {format(
+                parseDateTime(flight.delayedDepartureTime),
+                "HH:mm dd/MM"
+              )}
+            </Typography>
+          </Box>
+        </Box>
+      ) : (
+        <Typography>Not delayed</Typography>
+      )}
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <Typography>Aircraft: </Typography>
           {!isEditing ? (
@@ -126,7 +179,7 @@ export default function FlightDetails({ flight, aircrafts }) {
             >
               {aircrafts.map((aircraft) => {
                 return (
-                  <MenuItem value={aircraft.id}>
+                  <MenuItem key={aircraft.id} value={aircraft.id}>
                     {aircraft.brand} {aircraft.model}
                   </MenuItem>
                 );
@@ -134,7 +187,40 @@ export default function FlightDetails({ flight, aircrafts }) {
             </Select>
           )}
         </Box>
+
+        {isEditing ? (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setIsEditing(false);
+                changeFlightAircraft(flight, inputAircraft)
+                  .then((message) => {
+                    toast.success(message);
+                    setAircraft(inputAircraft);
+                    fetchFlightData();
+                    getFlightsData().then((res) => {
+                      setFlights(res);
+                    });
+                  })
+                  .catch((err) => {
+                    toast.error(err);
+                  });
+              }}
+            >
+              Apply
+            </Button>
+            <Button variant="outlined" color="warning" onClick={handleCancel}>
+              Cancel
+            </Button>
+          </Box>
+        ) : (
+          <Button variant="outlined" onClick={() => setIsEditing(true)}>
+            Change plane
+          </Button>
+        )}
       </Box>
+
       {/* Economy Price */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
@@ -171,28 +257,7 @@ export default function FlightDetails({ flight, aircrafts }) {
         </Box>
       </Box>
       {/* Editing Buttons */}
-      {isEditing && (
-        <Box sx={{ marginTop: "20px", display: "flex", gap: 2 }}>
-          <Button
-            sx={{ flex: 1 }}
-            variant="contained"
-            onClick={() => {
-              setIsEditing(false);
-              setAircraft(inputAircraft);
-            }}
-          >
-            Apply changes
-          </Button>
-          <Button
-            sx={{ flex: 1 }}
-            variant="outlined"
-            color="warning"
-            onClick={handleCancel}
-          >
-            Cancel changes
-          </Button>
-        </Box>
-      )}
+
       {isDelaying && (
         <Box sx={{ marginTop: "20px", display: "flex", gap: 2 }}>
           <TextField
@@ -226,13 +291,6 @@ export default function FlightDetails({ flight, aircrafts }) {
         sx={{ marginTop: "10px", border: "0.8px solid rgb(200, 200, 200)" }}
       />
       <Box sx={{ marginTop: "20px", display: "flex", gap: 2 }}>
-        <Button
-          sx={{ flex: 1 }}
-          variant="contained"
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </Button>
         <Button
           sx={{ flex: 1 }}
           variant="contained"

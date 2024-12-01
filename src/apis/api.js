@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://9w2jqf90-7070.asse.devtunnels.ms";
+import { useNavigate } from "react-router-dom";
+
+// const API_BASE_URL = "https://9w2jqf90-7070.asse.devtunnels.ms";
+const API_BASE_URL = "https://qairlline-backend.onrender.com";
 
 // Set up axios instance
 const apiClient = axios.create({
@@ -45,16 +48,15 @@ apiClient.interceptors.response.use(
           }
         );
 
-        // Save the new access token
         localStorage.setItem("accessToken", data.message);
-
-        // Update and retry the failed request
         originalRequest.headers["Authorization"] = data.message;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // Handle refresh token expiration or invalidity
         console.error("Refresh token expired. Please log in again.");
-        // Log out the user or redirect to login
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        const navigate = useNavigate();
+        navigate("/login", { replace: true });
         return Promise.reject(refreshError);
       }
     }
@@ -75,16 +77,48 @@ apiClient.interceptors.request.use((config) => {
 export const createFlight = async (data) => {
   try {
     const response = await apiClient.post("/api/admin/v1/flights", data);
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getFlightById = async (id) => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/flights/getById", {
+      params: {
+        id,
+      },
+    });
     return response.data.results;
   } catch (error) {
     throw error;
   }
 };
 
-export const updateFlight = async (data) => {
+export const changeFlightAircraft = async (flightData, newAircraftId) => {
   try {
-    const response = await apiClient.put("/api/admin/v1/flights", data);
-    return response.data.results;
+    const reqBody = {
+      ...flightData,
+      originAirport: flightData.originAirport.id,
+      destinationAirport: flightData.destinationAirport.id,
+      plane: newAircraftId,
+    };
+    console.log("Changing aircraft");
+    const response = await apiClient.put("/api/admin/v1/flights", reqBody);
+    return response.data.message;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const delayFlight = async (flightId, newDepartureTime) => {
+  try {
+    const response = await apiClient.put("/api/admin/v1/flights/delay", {
+      id: flightId,
+      newDepartureTime,
+    });
+    return response.data.message;
   } catch (err) {
     throw err;
   }

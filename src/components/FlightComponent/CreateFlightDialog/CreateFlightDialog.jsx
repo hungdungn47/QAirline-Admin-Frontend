@@ -63,7 +63,12 @@ export default function CreateFlightDialog({
       setErrors(validationErrors);
       return;
     }
-    onCreate(flightData);
+    const requestData = {
+      ...flightData,
+      plane: flightData.aircraft,
+    };
+    delete requestData.aircraft;
+    onCreate(requestData);
     onClose();
   };
 

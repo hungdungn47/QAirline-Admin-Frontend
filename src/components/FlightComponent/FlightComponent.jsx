@@ -1,7 +1,8 @@
 import { Box, Divider, Typography, Button } from "@mui/material";
 import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import "./flight_component.css";
-import { getHourAndDate } from "../../utils/utils";
+import { getHourAndDate, parseDateTime } from "../../utils/utils";
+import { parse, format, addHours, differenceInHours } from "date-fns";
 
 export default function FlightComponent({ flight, setCurrentFlight }) {
   const {
@@ -19,6 +20,22 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
     arrivalHour: getHourAndDate(flight.arrivalTime).hour,
     arrivalDate: getHourAndDate(flight.arrivalTime).date,
   };
+
+  let delayedDepartureTime = flight.delayedDepartureTime;
+  let delayedArrivalTime = "";
+
+  if (delayedDepartureTime !== null) {
+    delayedArrivalTime = format(
+      addHours(
+        parseDateTime(flight.arrivalTime),
+        differenceInHours(
+          parseDateTime(flight.delayedDepartureTime),
+          parseDateTime(flight.departureTime)
+        )
+      ),
+      "dd/MM/yyyy HH:mm:ss"
+    );
+  }
 
   return (
     <Box
@@ -47,8 +64,16 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
           {originAirport && (
             <div className="destination-code">{originAirport.location}</div>
           )}
-          <div className="medium-big-text">{departureHour}</div>
-          <div className="light-small-text">{departureDate}</div>
+          <div className="medium-big-text">
+            {delayedDepartureTime
+              ? format(parseDateTime(delayedDepartureTime), "HH:mm")
+              : departureHour}
+          </div>
+          <div className="light-small-text">
+            {delayedDepartureTime
+              ? format(parseDateTime(delayedDepartureTime), "dd/MM")
+              : departureDate}
+          </div>
         </Box>
         <Box>
           <ConnectingAirportsIcon fontSize="large" color="primary" />
@@ -63,8 +88,16 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
               {destinationAirport.location}
             </div>
           )}
-          <div className="medium-big-text">{arrivalHour}</div>
-          <div className="light-small-text">{arrivalDate}</div>
+          <div className="medium-big-text">
+            {delayedArrivalTime !== ""
+              ? format(parseDateTime(delayedArrivalTime), "HH:mm")
+              : arrivalHour}
+          </div>
+          <div className="light-small-text">
+            {delayedArrivalTime !== ""
+              ? format(parseDateTime(delayedArrivalTime), "dd/MM")
+              : arrivalDate}
+          </div>
         </Box>
       </Box>
       <Divider orientation="vertical" variant="middle" flexItem />

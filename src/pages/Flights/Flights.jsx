@@ -1,7 +1,12 @@
 import FlightComponent from "../../components/FlightComponent/FlightComponent";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { useState } from "react";
-import { fetchAircrafts, fetchAirports, getFlightsData } from "../../apis/api";
+import {
+  createFlight,
+  fetchAircrafts,
+  fetchAirports,
+  getFlightsData,
+} from "../../apis/api";
 import { useEffect } from "react";
 import FlightDetails from "../../components/FlightComponent/FlightDetails";
 import CreateFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateFlightDialog";
@@ -18,15 +23,6 @@ export default function Flights() {
   const [aircrafts, setAircrafts] = useState([]);
   const [airports, setAirports] = useState([]);
 
-  const handleCreate = (flight) => {
-    const formattedData = {
-      ...flight,
-      departureTime: fromDateTimeLocalFormat(flight.departureTime),
-      arrivalTime: fromDateTimeLocalFormat(flight.arrivalTime),
-    };
-    console.log("New Flight Data:", formattedData);
-    // Add logic to save the flight
-  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,6 +57,26 @@ export default function Flights() {
 
     fetchData();
   }, []);
+
+  const handleCreate = (flight) => {
+    const formattedData = {
+      ...flight,
+      departureTime: fromDateTimeLocalFormat(flight.departureTime),
+      arrivalTime: fromDateTimeLocalFormat(flight.arrivalTime),
+    };
+    console.log("New Flight Data:", formattedData);
+    // Add logic to save the flight
+    createFlight(formattedData)
+      .then((res) => {
+        getFlightsData().then((data) => {
+          setFlights(data);
+          toast.success(res);
+        });
+      })
+      .catch((err) => {
+        toast.error(err);
+      });
+  };
 
   if (loading) {
     return (
@@ -117,7 +133,11 @@ export default function Flights() {
           gap: 5,
         }}
       >
-        <FlightDetails flight={currentFlight} aircrafts={aircrafts} />
+        <FlightDetails
+          setFlights={setFlights}
+          flightData={currentFlight}
+          aircrafts={aircrafts}
+        />
         <Button
           sx={{ width: "40%", marginX: "auto" }}
           variant="contained"
