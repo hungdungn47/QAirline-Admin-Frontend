@@ -20,7 +20,9 @@ const clientNoInterceptor = axios.create({
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  async (response) => {
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -31,15 +33,23 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._retry = true; // Avoid infinite loop
       try {
-        const { data } = await axios.post("/api/admin/v1/refresh_jwt", {
-          refreshToken: localStorage.getItem("refreshToken"),
-        });
+        const { data } = await axios.post(
+          "/api/admin/v1/refresh_jwt",
+          localStorage.getItem("refreshToken"),
+          {
+            baseURL: API_BASE_URL,
+            headers: {
+              "Content-Type": "text/plain",
+              "X-auth-token": "QAirline-API-Token",
+            },
+          }
+        );
 
         // Save the new access token
-        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("accessToken", data.message);
 
         // Update and retry the failed request
-        originalRequest.headers["Authorization"] = data.accessToken;
+        originalRequest.headers["Authorization"] = data.message;
         return apiClient(originalRequest);
       } catch (refreshError) {
         // Handle refresh token expiration or invalidity

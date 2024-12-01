@@ -100,7 +100,7 @@ export default function Flights() {
           {flights.map((flight) => {
             return (
               <FlightComponent
-                // key={flight.flightNumber}
+                key={flight.id}
                 setCurrentFlight={setCurrentFlight}
                 flight={flight}
               />
@@ -117,7 +117,7 @@ export default function Flights() {
           gap: 5,
         }}
       >
-        <FlightDetails flight={currentFlight} />
+        <FlightDetails flight={currentFlight} aircrafts={aircrafts} />
         <Button
           sx={{ width: "40%", marginX: "auto" }}
           variant="contained"

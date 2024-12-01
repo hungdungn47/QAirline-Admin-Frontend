@@ -12,7 +12,7 @@ import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import { useState, useEffect } from "react";
 import { parse, format, addHours } from "date-fns";
 
-export default function FlightDetails({ flight }) {
+export default function FlightDetails({ flight, aircrafts }) {
   const flightID = flight.flightID;
   const parseDateTime = (dateTimeString) => {
     return parse(dateTimeString, "dd/MM/yyyy HH:mm:ss", new Date());
@@ -23,20 +23,13 @@ export default function FlightDetails({ flight }) {
   const [arrivalTime, setArrivalTime] = useState(
     parseDateTime(flight.arrivalTime)
   );
-  const destination = flight.destinationAirportCode;
-  const origin = flight.originAirportCode;
+  const destination = flight.destinationAirport;
+  const origin = flight.originAirport;
+  const economyPrice = flight.economyPrice;
+  const businessPrice = flight.businessPrice;
+  const [aircraft, setAircraft] = useState(flight.plane.id);
 
-  const [economyPrice, setEconomyPrice] = useState(flight.economyPrice);
-  const [businessPrice, setBusinessPrice] = useState(flight.businessPrice);
-  const [aircraft, setAircraft] = useState(flight.aircraftCode);
-
-  const [inputAircraft, setInputAircraft] = useState(flight.aircraftCode);
-  const [inputEconomyPrice, setInputEconomyPrice] = useState(
-    flight.economyPrice
-  );
-  const [inputBusinessPrice, setInputBusinessPrice] = useState(
-    flight.businessPrice
-  );
+  const [inputAircraft, setInputAircraft] = useState(flight.plane.id);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -47,14 +40,10 @@ export default function FlightDetails({ flight }) {
   useEffect(() => {
     setDepartureTime(parseDateTime(flight.departureTime));
     setArrivalTime(parseDateTime(flight.arrivalTime));
-    setAircraft(flight.aircraftCode);
-    setEconomyPrice(flight.economyPrice);
-    setBusinessPrice(flight.businessPrice);
+    setAircraft(flight.plane.id);
 
     // Reset inputs when the flight changes
-    setInputAircraft(flight.aircraftCode);
-    setInputEconomyPrice(flight.economyPrice);
-    setInputBusinessPrice(flight.businessPrice);
+    setInputAircraft(flight.plane.id);
     setIsEditing(false);
     setIsDelaying(false);
     setDelayTime(0);
@@ -62,30 +51,8 @@ export default function FlightDetails({ flight }) {
 
   const handleCancel = () => {
     setInputAircraft(aircraft);
-    setInputEconomyPrice(economyPrice);
-    setInputBusinessPrice(businessPrice);
     setIsEditing(false);
   };
-
-  // const applyDelay = () => {
-  //   if (delayTime > 0) {
-  //     const newDepartureTime = new Date(departureTime);
-  //     newDepartureTime.setHours(
-  //       newDepartureTime.getHours() + parseInt(delayTime, 10)
-  //     );
-  //     setDepartureTime(newDepartureTime);
-
-  //     // Optionally update the arrival time similarly (example assumes same delay for simplicity)
-  //     const newArrivalTime = new Date(arrivalTime);
-  //     newArrivalTime.setHours(
-  //       newArrivalTime.getHours() + parseInt(delayTime, 10)
-  //     );
-  //     setArrivalTime(newArrivalTime);
-
-  //     setIsDelaying(false);
-  //     console.log(`Flight delayed by ${delayTime} hours`);
-  //   }
-  // };
 
   const applyDelay = () => {
     if (delayTime > 0) {
@@ -147,7 +114,7 @@ export default function FlightDetails({ flight }) {
           <Typography>Aircraft: </Typography>
           {!isEditing ? (
             <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {aircraft}
+              {flight.plane.brand} {flight.plane.model}
             </Typography>
           ) : (
             <Select
@@ -157,9 +124,13 @@ export default function FlightDetails({ flight }) {
               }}
               value={inputAircraft}
             >
-              <MenuItem value="Airbus A320">Airbus A320</MenuItem>
-              <MenuItem value="Boeing 747">Boeing 747</MenuItem>
-              <MenuItem value="Boeing 737">Boeing 737</MenuItem>
+              {aircrafts.map((aircraft) => {
+                return (
+                  <MenuItem value={aircraft.id}>
+                    {aircraft.brand} {aircraft.model}
+                  </MenuItem>
+                );
+              })}
             </Select>
           )}
         </Box>
@@ -168,38 +139,35 @@ export default function FlightDetails({ flight }) {
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <Typography>Economy price: </Typography>
-          {!isEditing ? (
-            <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {economyPrice}
-            </Typography>
-          ) : (
-            <Input
-              type="number"
-              onChange={(e) => {
-                setInputEconomyPrice(e.target.value);
-              }}
-              value={inputEconomyPrice}
-            />
-          )}
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {economyPrice}
+          </Typography>
         </Box>
       </Box>
       {/* Business Price */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <Typography>Business price: </Typography>
-          {!isEditing ? (
-            <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {businessPrice}
-            </Typography>
-          ) : (
-            <Input
-              type="number"
-              onChange={(e) => {
-                setInputBusinessPrice(e.target.value);
-              }}
-              value={inputBusinessPrice}
-            />
-          )}
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {businessPrice}
+          </Typography>
+        </Box>
+      </Box>
+
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <Typography>Economy seats left: </Typography>
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {flight.availableEconomySeats}
+          </Typography>
+        </Box>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <Typography>Business seats left: </Typography>
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {flight.availableBusinessSeats}
+          </Typography>
         </Box>
       </Box>
       {/* Editing Buttons */}
@@ -211,8 +179,6 @@ export default function FlightDetails({ flight }) {
             onClick={() => {
               setIsEditing(false);
               setAircraft(inputAircraft);
-              setEconomyPrice(inputEconomyPrice);
-              setBusinessPrice(inputBusinessPrice);
             }}
           >
             Apply changes

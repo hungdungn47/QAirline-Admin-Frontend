@@ -44,7 +44,9 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
             textAlign: "start",
           }}
         >
-          <div className="destination-code">{originAirport.location}</div>
+          {originAirport && (
+            <div className="destination-code">{originAirport.location}</div>
+          )}
           <div className="medium-big-text">{departureHour}</div>
           <div className="light-small-text">{departureDate}</div>
         </Box>
@@ -56,7 +58,11 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
             textAlign: "end",
           }}
         >
-          <div className="destination-code">{destinationAirport.location}</div>
+          {destinationAirport && (
+            <div className="destination-code">
+              {destinationAirport.location}
+            </div>
+          )}
           <div className="medium-big-text">{arrivalHour}</div>
           <div className="light-small-text">{arrivalDate}</div>
         </Box>
@@ -75,15 +81,15 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
         <Box style={{ display: "flex", justifyContent: "space-between" }}>
           <Typography>Flight number: </Typography>
           <Typography color="primary" fontWeight="bold">
-            {flight.flightID}
+            {flight.flightNumber}
           </Typography>
         </Box>
-        <Box style={{ display: "flex", justifyContent: "space-between" }}>
+        {/* <Box style={{ display: "flex", justifyContent: "space-between" }}>
           <Typography>Estimated flying time: </Typography>
           <Typography color="primary" fontWeight="bold">
             2 hours
           </Typography>
-        </Box>
+        </Box> */}
         <Box style={{ display: "flex", justifyContent: "space-between" }}>
           <Typography>Aircraft: </Typography>
           <Typography color="primary" fontWeight="bold">
