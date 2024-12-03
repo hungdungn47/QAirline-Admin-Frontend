@@ -14,7 +14,9 @@ import {
   FormControl,
   Box,
   Button,
+  Typography,
 } from "@mui/material";
+import { getBooking } from "../../apis/api";
 
 // Sample data
 const sampleTickets = [
@@ -48,8 +50,8 @@ const sampleTickets = [
 ];
 
 const Tickets = () => {
-  const [ticketsList, setTicketsList] = useState(sampleTickets);
-  const [filteredTickets, setFilteredTickets] = useState(sampleTickets);
+  const [ticketsList, setTicketsList] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
   const [filters, setFilters] = useState({
     flightNumber: "",
     origin: "",
@@ -58,6 +60,14 @@ const Tickets = () => {
     bookingTime: "",
     departureTime: "",
   });
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      const data = await getBooking();
+      setTicketsList(data);
+    };
+    fetchTickets();
+  }, []);
 
   // Filter tickets based on criteria
   useEffect(() => {
@@ -119,8 +129,7 @@ const Tickets = () => {
   };
 
   return (
-    <div style={{ margin: "20px" }}>
-      <h1>Booked Tickets Management</h1>
+    <div className="m-5">
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, marginBottom: 3 }}>
         <TextField
           label="Flight Number"
@@ -178,12 +187,18 @@ const Tickets = () => {
             shrink: true,
           }}
         />
-        <Button variant="outlined" onClick={handleClearFilters}>
+        <Button variant="outlined" color="warning" onClick={handleClearFilters}>
           Clear Filters
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer
+        style={{
+          marginTop: "20px",
+          boxShadow: "0 0px 5px rgb(0, 0, 0, 0.3)",
+        }}
+        component={Paper}
+      >
         <Table>
           <TableHead>
             <TableRow>

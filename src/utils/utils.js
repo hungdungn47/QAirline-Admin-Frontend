@@ -8,7 +8,7 @@ export const getHourAndDate = (dateTimeStr) => {
 };
 export const fromDateTimeLocalFormat = (isoString) => {
   const date = parseISO(isoString);
-  return format(date, "MM/dd/yyyy HH:mm:ss");
+  return format(date, "dd/MM/yyyy HH:mm:ss");
 };
 
 export const parseDateTime = (dateTimeString) => {

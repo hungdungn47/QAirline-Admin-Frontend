@@ -13,6 +13,7 @@ import CreateFlightDialog from "../../components/FlightComponent/CreateFlightDia
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fromDateTimeLocalFormat } from "../../utils/utils";
+import { useNavigate } from "react-router-dom";
 
 export default function Flights() {
   const [flights, setFlights] = useState([]);
@@ -22,13 +23,17 @@ export default function Flights() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [aircrafts, setAircrafts] = useState([]);
   const [airports, setAirports] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const flightData = await getFlightsData();
-        toast.success("Fetched flights!");
+        const response = await getFlightsData();
+        if (response.code === 401) {
+          navigate("/login");
+        }
+        const flightData = response.results;
         setFlights(flightData);
         setCurrentFlight(flightData[0]);
         fetchAircrafts()
@@ -69,7 +74,7 @@ export default function Flights() {
     createFlight(formattedData)
       .then((res) => {
         getFlightsData().then((data) => {
-          setFlights(data);
+          setFlights(data.results);
           toast.success(res);
         });
       })
@@ -91,7 +96,7 @@ export default function Flights() {
         }}
       >
         <CircularProgress />
-        <Typography>Loading board...</Typography>
+        <Typography>Loading flights...</Typography>
       </Box>
     );
   }

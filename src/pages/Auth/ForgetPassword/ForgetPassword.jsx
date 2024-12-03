@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
+import { forgotPasswordApi } from "../../../apis/api";
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState("");
@@ -20,24 +21,11 @@ export default function ForgetPassword() {
 
     setLoading(true);
     try {
-      // Send request to the server (replace with your backend endpoint)
-      // const response = await fetch("/api/forgot-password", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ email }),
-      // });
-      // const data = await response.json();
-      // if (response.ok) {
-      //   setMessage("A reset password link has been sent to your email.");
-      //   setError("");
-      // } else {
-      //   setError(data.message || "Failed to send email.");
-      // }
-      setMessage("A reset password link has been sent to your email.");
+      const response = await forgotPasswordApi(email);
+
+      setMessage(response);
     } catch (error) {
-      setError("Something went wrong. Please try again.");
+      setError(error.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -54,11 +42,11 @@ export default function ForgetPassword() {
     >
       <Box
         sx={{
-          maxWidth: 400,
           height: "30%",
-          borderRadius: 12,
-          margin: "auto",
-          padding: 2,
+          maxWidth: 400,
+          padding: 4,
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+          borderRadius: 2,
         }}
       >
         <Typography variant="h6" gutterBottom>

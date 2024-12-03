@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 // const API_BASE_URL = "https://9w2jqf90-7070.asse.devtunnels.ms";
 const API_BASE_URL = "https://qairlline-backend.onrender.com";
-
 // Set up axios instance
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -24,6 +23,10 @@ const clientNoInterceptor = axios.create({
 
 apiClient.interceptors.response.use(
   async (response) => {
+    if (response.data.code === 401) {
+      console.log("Handling invalid token");
+      window.location.href = "/login";
+    }
     return response;
   },
   async (error) => {
@@ -36,6 +39,7 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._retry = true; // Avoid infinite loop
       try {
+        console.log("Retrying");
         const { data } = await axios.post(
           "/api/admin/v1/refresh_jwt",
           localStorage.getItem("refreshToken"),
@@ -52,10 +56,9 @@ apiClient.interceptors.response.use(
         originalRequest.headers["Authorization"] = data.message;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        console.error("Refresh token expired. Please log in again.");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        const navigate = useNavigate();
+
         navigate("/login", { replace: true });
         return Promise.reject(refreshError);
       }
@@ -127,7 +130,7 @@ export const delayFlight = async (flightId, newDepartureTime) => {
 export const getFlightsData = async () => {
   try {
     const response = await apiClient.get("/api/admin/v1/flights");
-    return response.data.results;
+    return response.data;
   } catch (error) {
     console.error("Error fetching flights data:", error);
     throw error;
@@ -190,15 +193,71 @@ export const fetchAirports = async () => {
 
 export const fetchNewsApi = async () => {
   try {
-    const response = await apiClient.get("/api/admin/v1/news/filterNews", {
-      params: {
-        folder: "Test",
-      },
-    });
-    console.log(response);
+    const response = await apiClient.get("/api/admin/v1/news/getAll");
     return response.data.results;
   } catch (error) {
     console.error("Error fetching news data:", error);
+    throw error;
+  }
+};
+
+export const getAllNewsFolder = async () => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/news/folders");
+    return response.data.results;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllNewsClassification = async () => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/news/classification");
+    return response.data.results;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateNews = async (data) => {
+  try {
+    const response = await apiClient.put("/api/admin/v1/news", data);
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};
+export const deleteNews = async (newsId) => {
+  try {
+    const response = await apiClient.delete("/api/admin/v1/news", {
+      params: {
+        newsId,
+      },
+    });
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createNews = async (data) => {
+  try {
+    const response = await apiClient.post("/api/admin/v1/news", data);
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getBooking = async (filterParams) => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/booking/filter", {
+      params: {
+        filterParams,
+      },
+    });
+    return response.data.results;
+  } catch (error) {
     throw error;
   }
 };
@@ -215,14 +274,22 @@ export const loginApi = async (username, password) => {
     console.log(response);
     return response.data;
   } catch (error) {
-    console.error("Error logging in:", error);
     throw error;
   }
 };
 
-export const refreshToken = async () => {
-  const response = await apiClient.post("/api/admin/v1/refresh_jwt", {
-    refreshToken: localStorage.getItem("refreshToken"),
-  });
-  return response.data; // { accessToken }
+export const forgotPasswordApi = async (email) => {
+  try {
+    console.log("Email to reset: ", email);
+    const response = await axios.post("/api/admin/v1/forgot_password", email, {
+      baseURL: API_BASE_URL,
+      headers: {
+        "X-auth-token": "QAirline-API-Token",
+        "Content-Type": "text/plain",
+      },
+    });
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
 };

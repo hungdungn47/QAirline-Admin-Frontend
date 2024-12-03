@@ -11,14 +11,15 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import Logo from "../../assets/QAirlineLogoFinal.png";
 
 const pages = ["Flights", "Aircrafts", "Tickets", "News"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const location = useLocation();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -28,43 +29,48 @@ function NavBar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar color="white" position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+          <img src={Logo} style={{ height: "3rem", margin: "0" }} />
+
+          <Box
             sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "white",
-              textDecoration: "none",
+              flexGrow: 1,
+              display: { marginLeft: "2rem", display: "flex" },
             }}
           >
-            LOGO
-          </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Link
-                to={`/dashboard/${page}`}
-                key={page}
-                style={{ textDecoration: "none" }}
-              >
-                <Button
+            {pages.map((page) => {
+              const isOnFlight = page === "Flights";
+              const isActive = !isOnFlight
+                ? location.pathname === `/dashboard/${page}`
+                : location.pathname === `/dashboard`;
+              return (
+                <Link
+                  to={`/dashboard/${page}`}
                   key={page}
-                  sx={{ my: 2, color: "white", display: "block" }}
+                  style={{ textDecoration: "none" }}
                 >
-                  {page}
-                </Button>
-              </Link>
-            ))}
+                  <Button
+                    key={page}
+                    sx={{
+                      fontSize: "1.2rem",
+                      height: "100%",
+                      display: "block",
+                      backgroundColor: isActive ? "primary.main" : "inherit",
+                      color: isActive ? "white" : "inherit",
+                      "&:hover": {
+                        backgroundColor: isActive
+                          ? "primary.main"
+                          : "rgba(0, 0, 0, 0.08)",
+                      },
+                    }}
+                  >
+                    {page}
+                  </Button>
+                </Link>
+              );
+            })}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">

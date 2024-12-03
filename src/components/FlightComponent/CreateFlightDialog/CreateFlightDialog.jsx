@@ -180,9 +180,6 @@ export default function CreateFlightDialog({
             error={!!errors.aircraft}
             helperText={errors.aircraft}
           >
-            <MenuItem value="A319">A319</MenuItem>
-            <MenuItem value="A320">A320</MenuItem>
-            <MenuItem value="B737">B737</MenuItem>
             {aircrafts.map((aircraft) => {
               return (
                 <MenuItem key={aircraft.id} value={aircraft.id}>

@@ -93,7 +93,7 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           setIsDelaying(false);
           fetchFlightData();
           getFlightsData().then((res) => {
-            setFlights(res);
+            setFlights(res.results);
           });
           toast.success(message);
         })
@@ -102,6 +102,8 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
         });
 
       // console.log(`Flight delayed by ${delayTime} hours`);
+    } else {
+      toast.error("Delaying time cannot be smaller than 0!");
     }
   };
 
@@ -200,7 +202,7 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
                     setAircraft(inputAircraft);
                     fetchFlightData();
                     getFlightsData().then((res) => {
-                      setFlights(res);
+                      setFlights(res.results);
                     });
                   })
                   .catch((err) => {

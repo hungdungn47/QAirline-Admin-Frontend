@@ -31,24 +31,6 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      // Send request to reset password (replace with your backend endpoint)
-      // const response = await fetch(`/api/reset-password/${token}`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ password }),
-      // });
-
-      // const data = await response.json();
-
-      // if (response.ok) {
-      //   setMessage("Your password has been reset successfully.");
-      //   setError("");
-      //   setTimeout(() => history.push("/login"), 2000); // Redirect to login page after success
-      // } else {
-      //   setError(data.message || "Failed to reset password.");
-      // }
       setMessage("Your password has been reset successfully.");
       navigate("/login");
     } catch (error) {
@@ -65,44 +47,55 @@ export default function ResetPassword() {
   // }, [token]);
 
   return (
-    <Box sx={{ maxWidth: 400, margin: "auto", padding: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Reset Password
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="New Password"
-          type="password"
-          fullWidth
-          value={password}
-          onChange={handlePasswordChange}
-          error={!!error}
-          helperText={error}
-          sx={{ marginBottom: 2 }}
-        />
-        <TextField
-          label="Confirm Password"
-          type="password"
-          fullWidth
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          error={!!error}
-          helperText={error}
-          sx={{ marginBottom: 2 }}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          sx={{ marginTop: 2 }}
-          disabled={loading}
-        >
-          {loading ? "Resetting..." : "Reset Password"}
-        </Button>
-      </form>
-      {message && (
-        <Typography sx={{ marginTop: 2, color: "green" }}>{message}</Typography>
-      )}
-    </Box>
+    <div className="h-[100vh] flex items-center justify-center">
+      <Box
+        sx={{
+          maxWidth: 400,
+          padding: 4,
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+          borderRadius: 2,
+        }}
+      >
+        <Typography variant="h6" gutterBottom>
+          Reset Password
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="New Password"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={handlePasswordChange}
+            error={!!error}
+            helperText={error}
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+            error={!!error}
+            helperText={error}
+            sx={{ marginBottom: 2 }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ marginTop: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Resetting..." : "Reset Password"}
+          </Button>
+        </form>
+        {message && (
+          <Typography sx={{ marginTop: 2, color: "green" }}>
+            {message}
+          </Typography>
+        )}
+      </Box>
+    </div>
   );
 }

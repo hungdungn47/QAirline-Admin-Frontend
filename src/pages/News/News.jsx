@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Autocomplete,
   Table,
   TableBody,
   TableCell,
@@ -7,6 +8,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Typography,
   Button,
   Dialog,
   DialogTitle,
@@ -18,40 +20,76 @@ import {
   Box,
 } from "@mui/material";
 import axios from "axios";
-import { fetchNewsApi } from "../../apis/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  createNews,
+  deleteNews,
+  fetchNewsApi,
+  getAllNewsClassification,
+  getAllNewsFolder,
+  updateNews,
+} from "../../apis/api";
 
 const News = () => {
   const [newsList, setNewsList] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [folderList, setFolderList] = useState([]);
+  const [classificationList, setClassficationList] = useState([]);
   const [currentNews, setCurrentNews] = useState({
     id: null,
+    imageUrl: "",
     title: "",
     content: "",
-    category: "",
+    folder: "",
+    classification: "",
   });
   const [errors, setErrors] = useState({});
+  const [folderInput, setFolderInput] = useState(currentNews.folder || "");
+  const [classificationInput, setClassificationInput] = useState(
+    currentNews.classification || ""
+  );
 
   useEffect(() => {
     fetchNews();
+    fetchNewsFolderList();
+    fetchNewsClassificationList();
   }, []);
 
   const fetchNews = async () => {
-    const response = await fetchNewsApi(); // Fetching from fake API
-    setNewsList(response);
+    const newsData = await fetchNewsApi(); // Fetching from fake API
+    setNewsList(newsData);
+  };
+
+  const fetchNewsFolderList = async () => {
+    const res = await getAllNewsFolder();
+    setFolderList(res);
+  };
+
+  const fetchNewsClassificationList = async () => {
+    const res = await getAllNewsClassification();
+    setClassficationList(res);
   };
 
   const validateForm = () => {
-    const { title, content, category } = currentNews;
+    const { title, content, folder } = currentNews;
     const newErrors = {};
     if (!title.trim()) newErrors.title = "Title is required.";
     if (!content.trim()) newErrors.content = "Content is required.";
-    if (!category.trim()) newErrors.category = "Category is required.";
+    if (!folder.trim()) newErrors.folder = "Folder is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleOpenDialog = (
-    news = { id: null, title: "", content: "", category: "" }
+    news = {
+      id: null,
+      title: "",
+      imageUrl: "",
+      content: "",
+      folder: "",
+      classification: "",
+    }
   ) => {
     setCurrentNews(news);
     setErrors({});
@@ -66,26 +104,46 @@ const News = () => {
     if (!validateForm()) return;
 
     if (currentNews.id) {
-      // Update existing news
-      // await axios.put(`http://localhost:3001/news/${currentNews.id}`, currentNews);
-      setNewsList((prev) =>
-        prev.map((news) =>
-          news.id === currentNews.id ? { ...currentNews } : news
-        )
-      );
+      delete currentNews.createdAdmin;
+      delete currentNews.createdTime;
+      updateNews(currentNews)
+        .then((res) => {
+          setNewsList((prev) =>
+            prev.map((news) =>
+              news.id === currentNews.id ? { ...currentNews } : news
+            )
+          );
+          toast.success("res");
+        })
+        .catch((error) => {
+          toast.error(error.response.data);
+        });
     } else {
-      // Add new news
-      // await axios.post("http://localhost:3001/news", currentNews);
-      const newId = newsList.length ? newsList[newsList.length - 1].id + 1 : 1;
-      setNewsList((prev) => [...prev, { ...currentNews, id: newId }]);
+      console.log("Creating news: ", currentNews);
+      delete currentNews.id;
+      createNews(currentNews)
+        .then((res) => {
+          fetchNews();
+          fetchNewsFolderList();
+          fetchNewsClassificationList();
+          toast.success(res);
+        })
+        .catch((error) => {
+          toast.error(error.response.data);
+        });
     }
-    // fetchNews();
     handleCloseDialog();
   };
 
   const handleDeleteNews = async (id) => {
-    // await axios.delete(`http://localhost:3001/news/${id}`);
-    setNewsList((prev) => prev.filter((news) => news.id !== id));
+    deleteNews(id)
+      .then((res) => {
+        setNewsList((prev) => prev.filter((news) => news.id !== id));
+        toast.success(res);
+      })
+      .catch((error) => {
+        toast.error(error.response.data);
+      });
   };
 
   const handleChange = (e) => {
@@ -94,8 +152,8 @@ const News = () => {
   };
 
   return (
-    <div style={{ margin: "20px" }}>
-      <h1>News Management</h1>
+    <div className="m-5">
+      <ToastContainer />
       <Button
         variant="contained"
         color="primary"
@@ -103,13 +161,21 @@ const News = () => {
       >
         Add News
       </Button>
-      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+      <TableContainer
+        component={Paper}
+        style={{
+          marginTop: "20px",
+          boxShadow: "0 0px 5px rgb(0, 0, 0, 0.3)",
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Title</TableCell>
               <TableCell>Content</TableCell>
-              <TableCell>Category</TableCell>
+              <TableCell>Folder</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Classification</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -117,8 +183,35 @@ const News = () => {
             {newsList.map((news) => (
               <TableRow key={news.id}>
                 <TableCell>{news.title}</TableCell>
-                <TableCell>{news.content}</TableCell>
-                <TableCell>{news.category}</TableCell>
+                <TableCell>
+                  {news.content.length > 200 ? (
+                    <ContentCell content={news.content} />
+                  ) : (
+                    news.content.split("\n").map((line, index) => {
+                      return <p key={index}>{line}</p>;
+                    })
+                  )}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    wordBreak: "keep-all",
+                    overflowWrap: "normal",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {news.folder}
+                </TableCell>
+                <TableCell>
+                  <img
+                    src={news.imageUrl}
+                    style={{
+                      height: "150px",
+                      width: "250px",
+                      objectFit: "contain",
+                    }}
+                  />
+                </TableCell>
+                <TableCell>{news.classification}</TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <Button
@@ -143,7 +236,7 @@ const News = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullScreen>
         <DialogTitle>{currentNews.id ? "Edit News" : "Add News"}</DialogTitle>
         <DialogContent>
           <TextField
@@ -157,6 +250,16 @@ const News = () => {
             helperText={errors.title}
           />
           <TextField
+            label="Image URL"
+            name="imageUrl"
+            value={currentNews.imageUrl}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            error={!!errors.imageUrl}
+            helperText={errors.imageUrl}
+          />
+          <TextField
             label="Content"
             name="content"
             value={currentNews.content}
@@ -164,29 +267,69 @@ const News = () => {
             fullWidth
             margin="normal"
             multiline
-            rows={4}
+            rows={12}
             error={!!errors.content}
             helperText={errors.content}
           />
-          <Select
-            name="category"
-            value={currentNews.category}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            displayEmpty
-            error={!!errors.category}
-          >
-            <MenuItem value="" disabled>
-              Select Category
-            </MenuItem>
-            <MenuItem value="Travel Updates">Travel Updates</MenuItem>
-            <MenuItem value="Advisory">Advisory</MenuItem>
-            <MenuItem value="Announcements">Announcements</MenuItem>
-            <MenuItem value="Recognition">Recognition</MenuItem>
-            <MenuItem value="Sustainability">Sustainability</MenuItem>
-          </Select>
-          {errors.category && <p style={{ color: "red" }}>{errors.category}</p>}
+          <Autocomplete
+            freeSolo
+            options={folderList}
+            value={folderInput}
+            onChange={(event, newValue) => {
+              setFolderInput(newValue || ""); // Handle selection
+              handleChange({
+                target: { name: "folder", value: newValue || "" },
+              }); // Trigger onChange
+            }}
+            inputValue={folderInput}
+            onInputChange={(event, newInputValue) => {
+              setFolderInput(newInputValue); // Handle typing
+              handleChange({
+                target: { name: "folder", value: newInputValue },
+              });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Folder"
+                sx={{ marginTop: "1rem" }}
+                fullWidth
+                error={!!errors.folder}
+                helperText={errors.folder}
+              />
+            )}
+          />
+
+          {/* Classification Dropdown */}
+          <Autocomplete
+            freeSolo
+            options={classificationList}
+            value={classificationInput}
+            onChange={(event, newValue) => {
+              setClassificationInput(newValue || "");
+              handleChange({
+                target: { name: "classification", value: newValue || "" },
+              });
+            }}
+            inputValue={classificationInput}
+            onInputChange={(event, newInputValue) => {
+              setClassificationInput(newInputValue);
+              handleChange({
+                target: { name: "classification", value: newInputValue },
+              });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Classification"
+                sx={{ marginTop: "1rem" }}
+                fullWidth
+                error={!!errors.classification}
+                helperText={errors.classification}
+              />
+            )}
+          />
+          {errors.folder && <p style={{ color: "red" }}>{errors.folder}</p>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
@@ -200,5 +343,27 @@ const News = () => {
     </div>
   );
 };
+
+function ContentCell({ content }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <div className="flex flex-col items-end">
+      <div className="block">
+        {isExpanded ? content : `${content.slice(0, 200)}...`}
+      </div>
+      <div
+        onClick={toggleExpanded}
+        className="text-blue-500 hover:underline mt-2 cursor-pointer"
+      >
+        {isExpanded ? "See less" : "See more"}
+      </div>
+    </div>
+  );
+}
 
 export default News;

@@ -130,10 +130,7 @@ export default function Aircrafts() {
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Aircraft Management
-      </Typography>
+    <div className="m-5">
       <Button
         variant="contained"
         color="primary"
@@ -142,7 +139,12 @@ export default function Aircrafts() {
       >
         Add Aircraft
       </Button>
-      <TableContainer component={Paper}>
+      <TableContainer
+        style={{
+          boxShadow: "0 0px 5px rgb(0, 0, 0, 0.3)",
+        }}
+        component={Paper}
+      >
         <Table>
           <TableHead>
             <TableRow>
@@ -234,6 +236,6 @@ export default function Aircrafts() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 }

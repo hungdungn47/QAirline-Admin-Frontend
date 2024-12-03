@@ -38,8 +38,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Home />} />
-            <Route path="flights" element={<Flights />} />
+            {/* <Route index element={<Home />} /> */}
+            <Route index element={<Flights />} />
             <Route path="tickets" element={<Tickets />} />
             <Route path="aircrafts" element={<Aircrafts />} />
             <Route path="news" element={<News />} />

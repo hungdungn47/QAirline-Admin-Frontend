@@ -9,6 +9,8 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { loginApi } from "../../../apis/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,31 +25,12 @@ export default function Login() {
 
     try {
       const { results } = await loginApi(email, password);
-      console.log("Logged in");
-      console.log(`access token: ${results.jwtToken}`);
       localStorage.setItem("accessToken", results.jwtToken);
       localStorage.setItem("refreshToken", results.refreshToken);
-      navigate("/dashboard/news");
+      navigate("/dashboard");
     } catch (err) {
-      console.log("Error");
-      setError("Error logging in");
+      toast.error(err.response.data.message);
     }
-    // Mock admin credentials
-    // const adminCredentials = {
-    //   email: "admin",
-    //   password: "password123",
-    // };
-
-    // if (
-    //   email === adminCredentials.email &&
-    //   password === adminCredentials.password
-    // ) {
-    //   setError("");
-    //   localStorage.setItem("isAuthenticated", "true"); // Store authentication state
-    //   navigate("/dashboard/flights"); // Navigate to the dashboard
-    // } else {
-    //   setError("Invalid email or password.");
-    // }
   };
 
   return (
@@ -103,6 +86,7 @@ export default function Login() {
           </span>
         </Box>
       </Paper>
+      <ToastContainer />
     </Box>
   );
 }
