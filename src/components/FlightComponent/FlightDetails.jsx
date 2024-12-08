@@ -22,6 +22,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { parseDateTime } from "../../utils/utils";
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
 export default function FlightDetails({ setFlights, flightData, aircrafts }) {
   const [flight, setFlight] = useState(flightData);
@@ -137,12 +138,10 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
   if (!flight.available) {
     return (
       <Box>
-        <Typography fontSize="24px" color="primary">
-          {flight.flightNumber}
-        </Typography>
+        <div className="text-lg text-theme-primary">{flight.flightNumber}</div>
         <Box
           sx={{
-            marginY: "15px",
+            marginY: "10px",
             flex: "2",
             display: "flex",
             justifyContent: "space-between",
@@ -159,7 +158,7 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
             <div>{format(departureTime, "dd/MM/yyyy")}</div>
           </Box>
           <Box>
-            <ConnectingAirportsIcon fontSize="large" color="primary" />
+            <ArrowRightAltIcon fontSize="large" color="primary" />
           </Box>
           <Box sx={{ textAlign: "end" }}>
             <div className="text-theme-primary font-bold text-2xl">
@@ -173,26 +172,37 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
         </Box>
         <Typography color="error">This flight is closed!</Typography>
         <div className="text-gray-400 !important">
-          {flight.delayedDepartureTime ? (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>Delayed until: </div>
-              <div className="font-bold text-xl">
-                {format(
-                  parseDateTime(flight.delayedDepartureTime),
-                  "HH:mm dd/MM"
-                )}
-              </div>
-            </Box>
-          ) : (
-            <div>Not delayed</div>
-          )}
+          {flight.delayed ? (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography>Scheduled departure time: </Typography>
+                <Typography color="primary" fontWeight="bold" fontSize="20px">
+                  {format(parseDateTime(flight.departureTime), "HH:mm dd/MM")}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography>Delayed until: </Typography>
+                <Typography color="primary" fontWeight="bold" fontSize="20px">
+                  {format(
+                    parseDateTime(flight.delayedDepartureTime),
+                    "HH:mm dd/MM"
+                  )}
+                </Typography>
+              </Box>
+            </>
+          ) : null}
           <Box
             sx={{
               display: "flex",
@@ -271,19 +281,16 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
   }
   return (
     <Box>
-      <Typography fontSize="24px" color="primary">
-        {flight.flightNumber}
-      </Typography>
+      <div className="text-lg text-theme-primary">{flight.flightNumber}</div>
       <Box
         sx={{
-          marginY: "15px",
+          marginY: "10px",
           flex: "2",
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
         }}
       >
-        <Box sx={{ textAlign: "start" }}>
+        <Box sx={{ textAlign: "start", flex: 1 }}>
           <div className="text-theme-primary font-bold text-2xl">{origin}</div>
           <div className="font-bold text-xl">
             {format(departureTime, "HH:mm")}
@@ -291,9 +298,9 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           <div>{format(departureTime, "dd/MM/yyyy")}</div>
         </Box>
         <Box>
-          <ConnectingAirportsIcon fontSize="large" color="primary" />
+          <ArrowRightAltIcon fontSize="large" color="primary" />
         </Box>
-        <Box sx={{ textAlign: "end" }}>
+        <Box sx={{ textAlign: "end", flex: 1 }}>
           <div className="text-theme-primary font-bold text-2xl">
             {destination}
           </div>
@@ -305,22 +312,37 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           </div>
         </Box>
       </Box>
-      {flight.delayedDepartureTime ? (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography>Delayed until: </Typography>
-          <Typography color="primary" fontWeight="bold" fontSize="20px">
-            {format(parseDateTime(flight.delayedDepartureTime), "HH:mm dd/MM")}
-          </Typography>
-        </Box>
-      ) : (
-        <Typography>Not delayed</Typography>
-      )}
+      {flight.delayed ? (
+        <>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography>Scheduled departure time: </Typography>
+            <Typography color="primary" fontWeight="bold" fontSize="20px">
+              {format(parseDateTime(flight.departureTime), "HH:mm dd/MM")}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography>Delayed until: </Typography>
+            <Typography color="primary" fontWeight="bold" fontSize="20px">
+              {format(
+                parseDateTime(flight.delayedDepartureTime),
+                "HH:mm dd/MM"
+              )}
+            </Typography>
+          </Box>
+        </>
+      ) : null}
       <Box
         sx={{
           display: "flex",

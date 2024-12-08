@@ -122,19 +122,29 @@ export default function Flights() {
           height: "calc(100vh - 79px)",
           flex: "3",
           marginTop: "10px",
-          overflowY: "auto",
+          marginLeft: "10px",
         }}
       >
-        <Box sx={{ margin: "10px", marginTop: "1px", marginBottom: "0" }}>
-          {flights.map((flight) => (
-            <FlightComponent
-              key={flight.id}
-              setCurrentFlight={setCurrentFlight}
-              handleOpenDetails={handleOpenDetails}
-              currentFlight={currentFlight}
-              flight={flight}
-            />
-          ))}
+        <Button variant="contained" onClick={() => setDialogOpen(true)}>
+          Create new flight
+        </Button>
+        <Box
+          sx={{
+            height: "100%",
+            overflowY: "auto",
+          }}
+        >
+          <Box sx={{ marginRight: "5px" }}>
+            {flights.map((flight) => (
+              <FlightComponent
+                key={flight.id}
+                setCurrentFlight={setCurrentFlight}
+                handleOpenDetails={handleOpenDetails}
+                currentFlight={currentFlight}
+                flight={flight}
+              />
+            ))}
+          </Box>
         </Box>
       </Box>
 
@@ -144,16 +154,11 @@ export default function Flights() {
           sx={{
             flex: "2",
             margin: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 5,
           }}
         >
           <Box
             sx={{
-              borderRadius: 5,
-              boxShadow: "0 0 5px rgba(0, 0, 0, 0.3)",
-              padding: 4,
+              padding: 2,
             }}
           >
             {currentFlight ? (
@@ -166,13 +171,6 @@ export default function Flights() {
               <Typography>Select a flight to view details</Typography>
             )}
           </Box>
-          <Button
-            sx={{ width: "40%", marginX: "auto" }}
-            variant="contained"
-            onClick={() => setDialogOpen(true)}
-          >
-            Create new flight
-          </Button>
         </Box>
       )}
 
