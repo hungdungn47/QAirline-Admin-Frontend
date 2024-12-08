@@ -238,7 +238,12 @@ const News = () => {
       </TableContainer> */}
       <div className="mt-3 grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {newsList.map((news) => (
-          <NewsComponent key={news.id} news={news} />
+          <NewsComponent
+            key={news.id}
+            news={news}
+            handleOpenDialog={handleOpenDialog}
+            handleDeleteNews={handleDeleteNews}
+          />
         ))}
       </div>
 
@@ -280,7 +285,7 @@ const News = () => {
           <Autocomplete
             freeSolo
             options={folderList}
-            value={folderInput}
+            value={currentNews.folder}
             onChange={(event, newValue) => {
               setFolderInput(newValue || ""); // Handle selection
               handleChange({
@@ -310,7 +315,7 @@ const News = () => {
           <Autocomplete
             freeSolo
             options={classificationList}
-            value={classificationInput}
+            value={currentNews.classification}
             onChange={(event, newValue) => {
               setClassificationInput(newValue || "");
               handleChange({
