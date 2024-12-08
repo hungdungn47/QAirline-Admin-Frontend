@@ -30,6 +30,7 @@ import {
   getAllNewsFolder,
   updateNews,
 } from "../../apis/api";
+import NewsComponent from "../../components/News/NewsComponent";
 
 const News = () => {
   const [newsList, setNewsList] = useState([]);
@@ -161,7 +162,7 @@ const News = () => {
       >
         Add News
       </Button>
-      <TableContainer
+      {/* <TableContainer
         component={Paper}
         style={{
           marginTop: "20px",
@@ -184,7 +185,7 @@ const News = () => {
               <TableRow key={news.id}>
                 <TableCell>{news.title}</TableCell>
                 <TableCell>
-                  {news.content.length > 200 ? (
+                  {news.content.length > 100 ? (
                     <ContentCell content={news.content} />
                   ) : (
                     news.content.split("\n").map((line, index) => {
@@ -234,7 +235,12 @@ const News = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
+      <div className="mt-3 grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {newsList.map((news) => (
+          <NewsComponent key={news.id} news={news} />
+        ))}
+      </div>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullScreen>
         <DialogTitle>{currentNews.id ? "Edit News" : "Add News"}</DialogTitle>
