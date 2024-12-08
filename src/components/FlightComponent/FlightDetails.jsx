@@ -165,9 +165,9 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
               {destination}
             </div>
             <div className="font-bold text-xl">
-              {format(departureTime, "HH:mm")}
+              {format(arrivalTime, "HH:mm")}
             </div>
-            <div>{format(departureTime, "dd/MM/yyyy")}</div>
+            <div>{format(arrivalTime, "dd/MM/yyyy")}</div>
           </Box>
         </Box>
         <Typography color="error">This flight is closed!</Typography>
@@ -305,10 +305,10 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
             {destination}
           </div>
           <div className="font-bold text-xl">
-            {format(departureTime, "HH:mm")}
+            {format(arrivalTime, "HH:mm")}
           </div>
           <div className="light-small-text">
-            {format(departureTime, "dd/MM/yyyy")}
+            {format(arrivalTime, "dd/MM/yyyy")}
           </div>
         </Box>
       </Box>

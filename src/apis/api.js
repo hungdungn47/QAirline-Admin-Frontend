@@ -99,6 +99,17 @@ export const getFlightById = async (id) => {
   }
 };
 
+export const filterFlights = async (filter) => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/flights/filter", {
+      params: filter,
+    });
+    return response.data.results;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const changeFlightAircraft = async (flightData, newAircraftId) => {
   try {
     const reqBody = {
