@@ -1,10 +1,14 @@
 import { Box, Divider, Typography, Button } from "@mui/material";
 import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
-import "./flight_component.css";
 import { getHourAndDate, parseDateTime } from "../../utils/utils";
 import { parse, format, addHours, differenceInHours } from "date-fns";
 
-export default function FlightComponent({ flight, setCurrentFlight }) {
+export default function FlightComponent({
+  flight,
+  currentFlight,
+  setCurrentFlight,
+  handleOpenDetails,
+}) {
   const {
     departureHour,
     departureDate,
@@ -23,6 +27,7 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
 
   let delayedDepartureTime = flight.delayedDepartureTime;
   let delayedArrivalTime = "";
+  const isSelected = flight.id === currentFlight.id;
 
   if (delayedDepartureTime !== null) {
     delayedArrivalTime = format(
@@ -41,10 +46,13 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
     <Box
       sx={{
         marginBottom: "10px",
+        marginTop: "10px",
         borderRadius: "12px",
         boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+        backgroundColor: `${isSelected ? "white" : "white"}`,
         display: "flex",
         justifyContent: "space-around",
+        border: `${isSelected ? "3px solid #69548D" : "none"}`,
         alignItems: "center",
       }}
     >
@@ -52,24 +60,22 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
         sx={{
           flex: "2",
           display: "flex",
-          justifyContent: "space-evenly",
+          justifyContent: "space-around",
           alignItems: "center",
         }}
       >
-        <Box
-          sx={{
-            textAlign: "start",
-          }}
-        >
+        <Box>
           {originAirport && (
-            <div className="destination-code">{originAirport.location}</div>
+            <div className="text-theme-primary text-xl font-bold">
+              {originAirport.location}
+            </div>
           )}
-          <div className="medium-big-text">
+          <div>
             {delayedDepartureTime
               ? format(parseDateTime(delayedDepartureTime), "HH:mm")
               : departureHour}
           </div>
-          <div className="light-small-text">
+          <div>
             {delayedDepartureTime
               ? format(parseDateTime(delayedDepartureTime), "dd/MM")
               : departureDate}
@@ -84,16 +90,16 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
           }}
         >
           {destinationAirport && (
-            <div className="destination-code">
+            <div className="text-theme-primary text-xl font-bold">
               {destinationAirport.location}
             </div>
           )}
-          <div className="medium-big-text">
+          <div>
             {delayedArrivalTime !== ""
               ? format(parseDateTime(delayedArrivalTime), "HH:mm")
               : arrivalHour}
           </div>
-          <div className="light-small-text">
+          <div>
             {delayedArrivalTime !== ""
               ? format(parseDateTime(delayedArrivalTime), "dd/MM")
               : arrivalDate}
@@ -130,8 +136,8 @@ export default function FlightComponent({ flight, setCurrentFlight }) {
           </Typography>
         </Box>
         <Button
-          onClick={() => setCurrentFlight(flight)}
-          variant="contained"
+          onClick={() => handleOpenDetails(flight)}
+          variant={isSelected ? "outlined" : "contained"}
           size="small"
         >
           Details

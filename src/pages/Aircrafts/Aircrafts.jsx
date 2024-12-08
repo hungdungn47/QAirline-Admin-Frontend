@@ -23,6 +23,8 @@ import {
   fetchAircrafts,
   updateAircraft,
 } from "../../apis/api";
+import { useMediaQuery } from "react-responsive";
+import AircraftComponent from "../../components/Aircraft/AircraftComponent";
 
 export default function Aircrafts() {
   const [aircrafts, setAircrafts] = useState([]);
@@ -47,6 +49,7 @@ export default function Aircrafts() {
       setLoading(false);
     }
   };
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   useEffect(() => {
     loadAircrafts();
   }, []);
@@ -75,12 +78,6 @@ export default function Aircrafts() {
     }
 
     if (editMode) {
-      // Update aircraft
-      // setAircrafts((prev) =>
-      //   prev.map((aircraft) =>
-      //     aircraft.id === selectedAircraft.id ? formData : aircraft
-      //   )
-      // );
       updateAircraft({ ...formData, id: selectedAircraft.id }).then((res) => {
         loadAircrafts();
       });
@@ -139,50 +136,61 @@ export default function Aircrafts() {
       >
         Add Aircraft
       </Button>
-      <TableContainer
-        style={{
-          boxShadow: "0 0px 5px rgb(0, 0, 0, 0.3)",
-        }}
-        component={Paper}
-      >
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Brand</TableCell>
-              <TableCell>Model</TableCell>
-              <TableCell>Economy seats</TableCell>
-              <TableCell>Business seats</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {aircrafts.map((aircraft) => (
-              <TableRow key={aircraft.id}>
-                <TableCell>{aircraft.id}</TableCell>
-                <TableCell>{aircraft.brand}</TableCell>
-                <TableCell>{aircraft.model}</TableCell>
-                <TableCell>{aircraft.numOfEconomySeats}</TableCell>
-                <TableCell>{aircraft.numOfBusinessSeats}</TableCell>
-                <TableCell>
-                  <Button
-                    color="primary"
-                    onClick={() => handleOpenDialog(aircraft)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    color="error"
-                    onClick={() => handleDelete(aircraft.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
+      {isMobile ? (
+        aircrafts.map((aircraft) => (
+          <AircraftComponent
+            key={aircraft.id}
+            aircraft={aircraft}
+            handleDelete={handleDelete}
+            handleOpenDialog={handleOpenDialog}
+          />
+        ))
+      ) : (
+        <TableContainer
+          style={{
+            boxShadow: "0 0px 5px rgb(0, 0, 0, 0.3)",
+          }}
+          component={Paper}
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Brand</TableCell>
+                <TableCell>Model</TableCell>
+                <TableCell>Economy seats</TableCell>
+                <TableCell>Business seats</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {aircrafts.map((aircraft) => (
+                <TableRow key={aircraft.id}>
+                  <TableCell>{aircraft.id}</TableCell>
+                  <TableCell>{aircraft.brand}</TableCell>
+                  <TableCell>{aircraft.model}</TableCell>
+                  <TableCell>{aircraft.numOfEconomySeats}</TableCell>
+                  <TableCell>{aircraft.numOfBusinessSeats}</TableCell>
+                  <TableCell>
+                    <Button
+                      color="primary"
+                      onClick={() => handleOpenDialog(aircraft)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      color="error"
+                      onClick={() => handleDelete(aircraft.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* Dialog for Adding/Editing */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>

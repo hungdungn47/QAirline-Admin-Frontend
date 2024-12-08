@@ -72,7 +72,9 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
           />
-          <Link to="/forgetPassword">Forgot password?</Link>
+          <Link to="/forgetPassword" className="text-theme-primary underline">
+            Forgot password?
+          </Link>
           <Button
             variant="contained"
             color="primary"
@@ -82,7 +84,10 @@ export default function Login() {
             Login
           </Button>
           <span>
-            Don't have an account? <Link to="/register">Register</Link>
+            Don't have an account?{" "}
+            <Link to="/register" className="text-theme-primary underline">
+              Register
+            </Link>
           </span>
         </Box>
       </Paper>

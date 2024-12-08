@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,7 +11,13 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
 import { Link, useLocation } from "react-router-dom";
+import { useMediaQuery, useTheme } from "@mui/material";
 import Logo from "../../assets/QAirlineLogoFinal.png";
 
 const pages = ["Flights", "Aircrafts", "Tickets", "News"];
@@ -19,59 +25,150 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
   const location = useLocation();
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-  const handleCloseUserMenu = () => {
+
+  const handleCloseUserMenu = (setting) => {
+    if (setting === "Logout") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "/login";
+    }
     setAnchorElUser(null);
+  };
+
+  const toggleDrawer = (open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setDrawerOpen(open);
   };
 
   return (
     <AppBar color="white" position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <img src={Logo} style={{ height: "3rem", margin: "0" }} />
-
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: { marginLeft: "2rem", display: "flex" },
-            }}
-          >
-            {pages.map((page) => {
-              const isOnFlight = page === "Flights";
-              const isActive = !isOnFlight
-                ? location.pathname === `/dashboard/${page}`
-                : location.pathname === `/dashboard`;
-              return (
-                <Link
-                  to={`/dashboard/${page}`}
-                  key={page}
-                  style={{ textDecoration: "none" }}
+          <img src={Logo} alt="Logo" style={{ height: "3rem", margin: "0" }} />
+          {/* Mobile Menu Icon */}
+          {isMobile ? (
+            <>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ ml: "auto" }}
+                onClick={toggleDrawer(true)}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Drawer
+                anchor="right"
+                open={drawerOpen}
+                onClose={toggleDrawer(false)}
+              >
+                <Box
+                  sx={{
+                    width: 250,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    height: "100%",
+                  }}
+                  role="presentation"
+                  onClick={toggleDrawer(false)}
+                  onKeyDown={toggleDrawer(false)}
                 >
-                  <Button
+                  <List>
+                    {pages.map((page) => {
+                      const isOnFlight = page === "Flights";
+                      const isActive = !isOnFlight
+                        ? location.pathname === `/dashboard/${page}`
+                        : location.pathname === `/dashboard`;
+                      return (
+                        <Link
+                          to={`/dashboard/${page}`}
+                          key={page}
+                          style={{
+                            textDecoration: "none",
+                            color: isActive
+                              ? theme.palette.primary.main
+                              : "inherit",
+                          }}
+                        >
+                          <ListItem>
+                            <ListItemText primary={page} />
+                          </ListItem>
+                        </Link>
+                      );
+                    })}
+                  </List>
+                  <Divider />
+                  <List>
+                    {settings.map((setting) => (
+                      <ListItem
+                        key={setting}
+                        onClick={() => handleCloseUserMenu(setting)}
+                      >
+                        <ListItemText primary={setting} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              </Drawer>
+            </>
+          ) : (
+            /* Desktop Menu */
+            <Box
+              sx={{
+                flexGrow: 1,
+                ml: 2,
+                display: "flex",
+              }}
+            >
+              {pages.map((page) => {
+                const isOnFlight = page === "Flights";
+                const isActive = !isOnFlight
+                  ? location.pathname === `/dashboard/${page}`
+                  : location.pathname === `/dashboard`;
+                return (
+                  <Link
+                    to={`/dashboard/${page}`}
                     key={page}
-                    sx={{
-                      fontSize: "1.2rem",
-                      height: "100%",
-                      display: "block",
-                      backgroundColor: isActive ? "primary.main" : "inherit",
-                      color: isActive ? "white" : "inherit",
-                      "&:hover": {
-                        backgroundColor: isActive
-                          ? "primary.main"
-                          : "rgba(0, 0, 0, 0.08)",
-                      },
-                    }}
+                    style={{ textDecoration: "none" }}
                   >
-                    {page}
-                  </Button>
-                </Link>
-              );
-            })}
-          </Box>
+                    <Button
+                      key={page}
+                      sx={{
+                        fontSize: "1.2rem",
+                        height: "100%",
+                        display: "block",
+                        backgroundColor: isActive ? "primary.main" : "inherit",
+                        color: isActive ? "white" : "inherit",
+                        "&:hover": {
+                          backgroundColor: isActive
+                            ? "primary.main"
+                            : "rgba(0, 0, 0, 0.08)",
+                        },
+                      }}
+                    >
+                      {page}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </Box>
+          )}
+
+          {/* Profile Avatar */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -95,7 +192,10 @@ function NavBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleCloseUserMenu(setting)}
+                >
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>
@@ -108,4 +208,5 @@ function NavBar() {
     </AppBar>
   );
 }
+
 export default NavBar;

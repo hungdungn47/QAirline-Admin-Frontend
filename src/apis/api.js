@@ -88,7 +88,7 @@ export const createFlight = async (data) => {
 
 export const getFlightById = async (id) => {
   try {
-    const response = await apiClient.get("/api/admin/v1/flights/getById", {
+    const response = await apiClient.get("/api/admin/v1/flights/get_by_id", {
       params: {
         id,
       },
@@ -193,7 +193,9 @@ export const fetchAirports = async () => {
 
 export const fetchNewsApi = async () => {
   try {
-    const response = await apiClient.get("/api/admin/v1/news/getAll");
+    const response = await apiClient.get("/api/admin/v1/news/filter_news", {
+      params: {},
+    });
     return response.data.results;
   } catch (error) {
     console.error("Error fetching news data:", error);
@@ -257,6 +259,40 @@ export const getBooking = async (filterParams) => {
       },
     });
     return response.data.results;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const closeFlight = async (flightId) => {
+  try {
+    const response = await apiClient.put(
+      "/api/admin/v1/flights/close",
+      flightId,
+      {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      }
+    );
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const openFlight = async (flightId) => {
+  try {
+    const response = await apiClient.put(
+      "/api/admin/v1/flights/open",
+      flightId,
+      {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      }
+    );
+    return response.data.message;
   } catch (error) {
     throw error;
   }

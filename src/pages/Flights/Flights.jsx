@@ -1,29 +1,46 @@
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Typography,
+  Modal,
+} from "@mui/material";
+import { useMediaQuery } from "react-responsive";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 import FlightComponent from "../../components/FlightComponent/FlightComponent";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import { useState } from "react";
+import FlightDetails from "../../components/FlightComponent/FlightDetails";
+import CreateFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateFlightDialog";
 import {
   createFlight,
   fetchAircrafts,
   fetchAirports,
   getFlightsData,
 } from "../../apis/api";
-import { useEffect } from "react";
-import FlightDetails from "../../components/FlightComponent/FlightDetails";
-import CreateFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateFlightDialog";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { fromDateTimeLocalFormat } from "../../utils/utils";
-import { useNavigate } from "react-router-dom";
 
 export default function Flights() {
   const [flights, setFlights] = useState([]);
-  const [currentFlight, setCurrentFlight] = useState({});
+  const [currentFlight, setCurrentFlight] = useState(null); // Set initial value to null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [aircrafts, setAircrafts] = useState([]);
   const [airports, setAirports] = useState([]);
   const navigate = useNavigate();
+  const isMobile = useMediaQuery({ query: "(max-width: 700px)" });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenDetails = (flight) => {
+    setCurrentFlight(flight);
+    if (isMobile) setIsModalOpen(true); // Open modal for mobile
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,26 +52,17 @@ export default function Flights() {
         }
         const flightData = response.results;
         setFlights(flightData);
-        setCurrentFlight(flightData[0]);
-        fetchAircrafts()
-          .then((data) => {
-            setAircrafts(data);
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error(error);
-          });
+        if (flightData.length > 0) {
+          setCurrentFlight(flightData[0]); // Set the first flight as the default
+        }
+        const aircraftData = await fetchAircrafts();
+        setAircrafts(aircraftData);
 
-        fetchAirports()
-          .then((data) => {
-            setAirports(data);
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error(error);
-          });
+        const airportData = await fetchAirports();
+        setAirports(airportData);
       } catch (err) {
         setError("Failed to fetch flights data.");
+        toast.error("Failed to fetch flights data.");
       } finally {
         setLoading(false);
       }
@@ -69,17 +77,15 @@ export default function Flights() {
       departureTime: fromDateTimeLocalFormat(flight.departureTime),
       arrivalTime: fromDateTimeLocalFormat(flight.arrivalTime),
     };
-    console.log("New Flight Data:", formattedData);
-    // Add logic to save the flight
     createFlight(formattedData)
       .then((res) => {
         getFlightsData().then((data) => {
           setFlights(data.results);
-          toast.success(res);
+          toast.success("Flight created successfully!");
         });
       })
       .catch((err) => {
-        toast.error(err);
+        toast.error("Failed to create flight.");
       });
   };
 
@@ -100,6 +106,7 @@ export default function Flights() {
       </Box>
     );
   }
+
   return (
     <Box
       sx={{
@@ -109,48 +116,94 @@ export default function Flights() {
         overflowY: "hidden",
       }}
     >
+      {/* Left-side flight list */}
       <Box
         sx={{
           height: "calc(100vh - 79px)",
-          flex: "4",
+          flex: "3",
           marginTop: "10px",
           overflowY: "auto",
         }}
       >
         <Box sx={{ margin: "10px", marginTop: "1px", marginBottom: "0" }}>
-          {flights.map((flight) => {
-            return (
-              <FlightComponent
-                key={flight.id}
-                setCurrentFlight={setCurrentFlight}
-                flight={flight}
-              />
-            );
-          })}
+          {flights.map((flight) => (
+            <FlightComponent
+              key={flight.id}
+              setCurrentFlight={setCurrentFlight}
+              handleOpenDetails={handleOpenDetails}
+              currentFlight={currentFlight}
+              flight={flight}
+            />
+          ))}
         </Box>
       </Box>
-      <Box
-        sx={{
-          flex: "2",
-          margin: "20px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 5,
-        }}
-      >
-        <FlightDetails
-          setFlights={setFlights}
-          flightData={currentFlight}
-          aircrafts={aircrafts}
-        />
-        <Button
-          sx={{ width: "40%", marginX: "auto" }}
-          variant="contained"
-          onClick={() => setDialogOpen(true)}
+
+      {/* Right-side flight details for desktop */}
+      {!isMobile && (
+        <Box
+          sx={{
+            flex: "2",
+            margin: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 5,
+          }}
         >
-          Create new flight
-        </Button>
-      </Box>
+          <Box
+            sx={{
+              borderRadius: 5,
+              boxShadow: "0 0 5px rgba(0, 0, 0, 0.3)",
+              padding: 4,
+            }}
+          >
+            {currentFlight ? (
+              <FlightDetails
+                setFlights={setFlights}
+                flightData={currentFlight}
+                aircrafts={aircrafts}
+              />
+            ) : (
+              <Typography>Select a flight to view details</Typography>
+            )}
+          </Box>
+          <Button
+            sx={{ width: "40%", marginX: "auto" }}
+            variant="contained"
+            onClick={() => setDialogOpen(true)}
+          >
+            Create new flight
+          </Button>
+        </Box>
+      )}
+
+      {/* Mobile modal for flight details */}
+      {isMobile && (
+        <Modal open={isModalOpen} onClose={handleCloseModal}>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              bgcolor: "background.paper",
+              p: 3,
+              boxShadow: 24,
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
+            }}
+          >
+            {currentFlight && (
+              <FlightDetails
+                setFlights={setFlights}
+                flightData={currentFlight}
+                aircrafts={aircrafts}
+              />
+            )}
+          </Box>
+        </Modal>
+      )}
+
+      {/* Create flight dialog */}
       <CreateFlightDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
