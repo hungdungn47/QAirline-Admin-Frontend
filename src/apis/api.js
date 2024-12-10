@@ -340,3 +340,20 @@ export const forgotPasswordApi = async (email) => {
     throw error;
   }
 };
+
+export const getCityOfAirport = async (airportId) => {
+  try {
+    const response = await apiClient.get(
+      "/api/admin/v1/airports/cities",
+      airportId,
+      {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      }
+    );
+    return response.data.results;
+  } catch (error) {
+    throw error;
+  }
+};

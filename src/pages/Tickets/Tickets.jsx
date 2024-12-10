@@ -16,38 +16,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import { getBooking } from "../../apis/api";
-
-// Sample data
-const sampleTickets = [
-  {
-    id: 1,
-    passengerName: "John Doe",
-    flightNumber: "AI-101",
-    origin: "JFK",
-    destination: "LAX",
-    bookingTime: "2024-11-20T10:30:00",
-    departureTime: "2024-11-25T14:00:00",
-  },
-  {
-    id: 2,
-    passengerName: "Jane Smith",
-    flightNumber: "AI-102",
-    origin: "LAX",
-    destination: "ORD",
-    bookingTime: "2024-11-21T09:15:00",
-    departureTime: "2024-11-26T16:00:00",
-  },
-  {
-    id: 3,
-    passengerName: "Samuel Green",
-    flightNumber: "AI-103",
-    origin: "ORD",
-    destination: "JFK",
-    bookingTime: "2024-11-22T12:00:00",
-    departureTime: "2024-11-27T10:00:00",
-  },
-];
+import { getBooking, getCityOfAirport, getFlightById } from "../../apis/api";
 
 const Tickets = () => {
   const [ticketsList, setTicketsList] = useState([]);
@@ -63,9 +32,30 @@ const Tickets = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      const data = await getBooking();
-      setTicketsList(data);
+      try {
+        const data = await getBooking(); // Fetch initial ticket data
+
+        // Fetch flight data for each ticket using Promise.all
+        const ticketsWithFlights = await Promise.all(
+          data.map(async (ticket) => {
+            if (ticket.flight?.id) {
+              const flight = await getFlightById(ticket.flight.id);
+              return {
+                ...ticket,
+                origin: flight.originAirport.city.cityName,
+                destination: flight.destinationAirport.city.cityName,
+              };
+            }
+            return ticket;
+          })
+        );
+
+        setTicketsList(ticketsWithFlights); // Update state with enriched tickets
+      } catch (error) {
+        console.error("Error fetching tickets or flight data:", error);
+      }
     };
+
     fetchTickets();
   }, []);
 
@@ -75,39 +65,45 @@ const Tickets = () => {
 
     if (filters.flightNumber)
       filtered = filtered.filter((ticket) =>
-        ticket.flightNumber
-          .toLowerCase()
+        ticket.flight?.flightNumber
+          ?.toLowerCase()
           .includes(filters.flightNumber.toLowerCase())
       );
 
     if (filters.origin)
       filtered = filtered.filter((ticket) =>
-        ticket.origin.toLowerCase().includes(filters.origin.toLowerCase())
+        ticket.origin?.toLowerCase().includes(filters.origin.toLowerCase())
       );
 
     if (filters.destination)
       filtered = filtered.filter((ticket) =>
         ticket.destination
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(filters.destination.toLowerCase())
       );
 
     if (filters.passengerName)
       filtered = filtered.filter((ticket) =>
-        ticket.passengerName
-          .toLowerCase()
-          .includes(filters.passengerName.toLowerCase())
+        ticket.name?.toLowerCase().includes(filters.passengerName.toLowerCase())
       );
 
-    if (filters.bookingTime)
-      filtered = filtered.filter(
-        (ticket) => ticket.bookingTime.split("T")[0] === filters.bookingTime
-      );
+    if (filters.departureTime) {
+      filtered = filtered.filter((ticket) => {
+        // Extract the date part from delayedDepartureTime (dd/MM/yyyy)
+        const departureDate =
+          ticket.flight?.delayedDepartureTime?.split(" ")[0]; // Getting the date part (dd/MM/yyyy)
 
-    if (filters.departureTime)
-      filtered = filtered.filter(
-        (ticket) => ticket.departureTime.split("T")[0] === filters.departureTime
-      );
+        const departureDateSplitted = departureDate.split("/");
+        const filterDateSplitted = filters.departureTime.split("-");
+
+        // Compare the extracted date with filters.departureTime
+        return (
+          departureDateSplitted[0] === filterDateSplitted[2] &&
+          departureDateSplitted[1] === filterDateSplitted[1] &&
+          departureDateSplitted[2] === filterDateSplitted[0]
+        );
+      });
+    }
 
     setFilteredTickets(filtered);
   }, [filters, ticketsList]);
@@ -130,9 +126,9 @@ const Tickets = () => {
 
   return (
     <div className="m-5">
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, marginBottom: 3 }}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
         <TextField
-          label="Flight Number"
+          label="Flight number"
           name="flightNumber"
           value={filters.flightNumber}
           onChange={handleChange}
@@ -140,7 +136,7 @@ const Tickets = () => {
           size="small"
         />
         <TextField
-          label="Origin Airport"
+          label="Origin city"
           name="origin"
           value={filters.origin}
           onChange={handleChange}
@@ -148,7 +144,7 @@ const Tickets = () => {
           size="small"
         />
         <TextField
-          label="Destination Airport"
+          label="Destination city"
           name="destination"
           value={filters.destination}
           onChange={handleChange}
@@ -156,7 +152,7 @@ const Tickets = () => {
           size="small"
         />
         <TextField
-          label="Passenger Name"
+          label="Passenger name"
           name="passengerName"
           value={filters.passengerName}
           onChange={handleChange}
@@ -164,19 +160,7 @@ const Tickets = () => {
           size="small"
         />
         <TextField
-          label="Booking Date"
-          name="bookingTime"
-          value={filters.bookingTime}
-          onChange={handleChange}
-          type="date"
-          variant="outlined"
-          size="small"
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-        <TextField
-          label="Departure Date"
+          label="Departure date"
           name="departureTime"
           value={filters.departureTime}
           onChange={handleChange}
@@ -187,10 +171,15 @@ const Tickets = () => {
             shrink: true,
           }}
         />
-        <Button variant="outlined" color="warning" onClick={handleClearFilters}>
-          Clear Filters
-        </Button>
-      </Box>
+      </div>
+      <Button
+        sx={{ marginTop: "5px" }}
+        variant="outlined"
+        color="warning"
+        onClick={handleClearFilters}
+      >
+        Clear Filters
+      </Button>
 
       <TableContainer
         style={{
@@ -201,28 +190,26 @@ const Tickets = () => {
       >
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>Passenger Name</TableCell>
+            <TableRow sx={{ backgroundColor: "#ECDCFF" }}>
+              <TableCell>Passenger name</TableCell>
               <TableCell>Flight Number</TableCell>
               <TableCell>Origin</TableCell>
               <TableCell>Destination</TableCell>
-              <TableCell>Booking Time</TableCell>
               <TableCell>Departure Time</TableCell>
+              <TableCell>Seat type</TableCell>
+              <TableCell>Price</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredTickets.map((ticket) => (
               <TableRow key={ticket.id}>
-                <TableCell>{ticket.passengerName}</TableCell>
-                <TableCell>{ticket.flightNumber}</TableCell>
+                <TableCell>{ticket.name}</TableCell>
+                <TableCell>{ticket.flight?.flightNumber}</TableCell>
                 <TableCell>{ticket.origin}</TableCell>
                 <TableCell>{ticket.destination}</TableCell>
-                <TableCell>
-                  {new Date(ticket.bookingTime).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(ticket.departureTime).toLocaleString()}
-                </TableCell>
+                <TableCell>{ticket.flight?.delayedDepartureTime}</TableCell>
+                <TableCell>{ticket.seatType}</TableCell>
+                <TableCell>{ticket.price}</TableCell>
               </TableRow>
             ))}
             {filteredTickets.length === 0 && (
