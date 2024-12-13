@@ -8,13 +8,10 @@ import {
   TableRow,
   Paper,
   TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
   Box,
   Button,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import { getBooking, getCityOfAirport, getFlightById } from "../../apis/api";
 
@@ -123,6 +120,24 @@ const Tickets = () => {
       departureTime: "",
     });
   };
+
+  if (ticketsList.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          width: "100vw",
+          gap: 2,
+        }}
+      >
+        <CircularProgress />
+        <Typography>Loading tickets...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <div className="m-5">

@@ -86,6 +86,15 @@ export const createFlight = async (data) => {
   }
 };
 
+export const createMultipleFlight = async (data) => {
+  try {
+    const response = await apiClient.post("/api/admin/v1/flights/add_batch", data);
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getFlightById = async (id) => {
   try {
     const response = await apiClient.get("/api/admin/v1/flights/get_by_id", {

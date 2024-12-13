@@ -18,6 +18,7 @@ import {
   Select,
   MenuItem,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -152,6 +153,24 @@ const News = () => {
     setCurrentNews((prev) => ({ ...prev, [name]: value }));
   };
 
+  if (newsList.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          width: "100vw",
+          gap: 2,
+        }}
+      >
+        <CircularProgress />
+        <Typography>Loading news...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <div className="m-5">
       <ToastContainer />
@@ -162,80 +181,7 @@ const News = () => {
       >
         Add News
       </Button>
-      {/* <TableContainer
-        component={Paper}
-        style={{
-          marginTop: "20px",
-          boxShadow: "0 0px 5px rgb(0, 0, 0, 0.3)",
-        }}
-      >
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Content</TableCell>
-              <TableCell>Folder</TableCell>
-              <TableCell>Image</TableCell>
-              <TableCell>Classification</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {newsList.map((news) => (
-              <TableRow key={news.id}>
-                <TableCell>{news.title}</TableCell>
-                <TableCell>
-                  {news.content.length > 100 ? (
-                    <ContentCell content={news.content} />
-                  ) : (
-                    news.content.split("\n").map((line, index) => {
-                      return <p key={index}>{line}</p>;
-                    })
-                  )}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    wordBreak: "keep-all",
-                    overflowWrap: "normal",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {news.folder}
-                </TableCell>
-                <TableCell>
-                  <img
-                    src={news.imageUrl}
-                    style={{
-                      height: "150px",
-                      width: "250px",
-                      objectFit: "contain",
-                    }}
-                  />
-                </TableCell>
-                <TableCell>{news.classification}</TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => handleOpenDialog(news)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDeleteNews(news.id)}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
+
       <div className="mt-3 grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {newsList.map((news) => (
           <NewsComponent

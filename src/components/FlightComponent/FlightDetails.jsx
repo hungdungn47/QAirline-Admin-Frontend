@@ -43,8 +43,8 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
     : parseDateTime(flight.arrivalTime);
   const [arrivalTime, setArrivalTime] = useState(initialArrivalTime);
 
-  const destination = flight.destinationAirport.airportCode;
-  const origin = flight.originAirport.airportCode;
+  // const destinationAirportCode = flight.destinationAirport.airportCode;
+  // const originAirportCode = flight.originAirport.airportCode;
   const [aircraft, setAircraft] = useState(flight.plane.id);
 
   const [inputAircraft, setInputAircraft] = useState(flight.plane.id);
@@ -150,7 +150,10 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
         >
           <Box sx={{ textAlign: "start" }}>
             <div className="text-theme-primary font-bold text-2xl">
-              {origin}
+              {flight.originAirport.airportName}
+            </div>
+            <div className="text-theme-primary font-bold text-md">
+              {flight.originAirport.airportCode}
             </div>
             <div className="font-bold text-xl">
               {format(departureTime, "HH:mm")}
@@ -162,7 +165,10 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           </Box>
           <Box sx={{ textAlign: "end" }}>
             <div className="text-theme-primary font-bold text-2xl">
-              {destination}
+              {flight.destinationAirport.airportName}
+            </div>
+            <div className="text-theme-primary font-bold text-md">
+              {flight.destinationAirport.airportCode}
             </div>
             <div className="font-bold text-xl">
               {format(arrivalTime, "HH:mm")}
@@ -291,7 +297,12 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
         }}
       >
         <Box sx={{ textAlign: "start", flex: 1 }}>
-          <div className="text-theme-primary font-bold text-2xl">{origin}</div>
+          <div className="text-theme-primary font-bold text-2xl">
+            {flight.originAirport.airportName}
+          </div>
+          <div className="text-theme-primary font-bold text-md">
+            {flight.originAirport.airportCode}
+          </div>
           <div className="font-bold text-xl">
             {format(departureTime, "HH:mm")}
           </div>
@@ -302,7 +313,10 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
         </Box>
         <Box sx={{ textAlign: "end", flex: 1 }}>
           <div className="text-theme-primary font-bold text-2xl">
-            {destination}
+            {flight.destinationAirport.airportName}
+          </div>
+          <div className="text-theme-primary font-bold text-md">
+            {flight.destinationAirport.airportCode}
           </div>
           <div className="font-bold text-xl">
             {format(arrivalTime, "HH:mm")}

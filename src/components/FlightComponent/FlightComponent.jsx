@@ -70,7 +70,7 @@ export default function FlightComponent({
         <Box sx={{ flex: 1 }}>
           {originAirport && (
             <div className="text-theme-primary text-lg lg:text-2xl font-bold">
-              {originAirport.location}
+              {originAirport.city.cityName}
             </div>
           )}
           <div className="text-md font-bold lg:text-lg">
@@ -93,7 +93,7 @@ export default function FlightComponent({
         >
           {destinationAirport && (
             <div className="text-theme-primary text-lg lg:text-2xl font-bold">
-              {destinationAirport.location}
+              {destinationAirport.city.cityName}
             </div>
           )}
           <div className="text-md font-bold lg:text-lg">

@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 
 import {
@@ -125,6 +126,24 @@ export default function Aircrafts() {
       loadAircrafts();
     });
   };
+
+  if (aircrafts.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          width: "100vw",
+          gap: 2,
+        }}
+      >
+        <CircularProgress />
+        <Typography>Loading aircrafts...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <div className="m-5">

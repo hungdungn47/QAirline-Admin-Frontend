@@ -17,6 +17,7 @@ import FlightDetails from "../../components/FlightComponent/FlightDetails";
 import CreateFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateFlightDialog";
 import {
   createFlight,
+  createMultipleFlight,
   fetchAircrafts,
   fetchAirports,
   filterFlights,
@@ -25,6 +26,7 @@ import {
 import { fromDateTimeLocalFormat } from "../../utils/utils";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import { Add } from "@mui/icons-material";
+import CreateMultipleFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateMultipleFlightDialog";
 
 export default function Flights() {
   const [flights, setFlights] = useState([]);
@@ -32,6 +34,7 @@ export default function Flights() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creatingMultipleFlight, setCreatingMultipleFlight] = useState(false);
   const [aircrafts, setAircrafts] = useState([]);
   const [airports, setAirports] = useState([]);
   const navigate = useNavigate();
@@ -142,6 +145,26 @@ export default function Flights() {
       });
   };
 
+  const handleCreateMultiple = (flight) => {
+    const formattedData = {
+      ...flight,
+      departureTime: flight.departureTime + ":00",
+      arrivalTime: flight.arrivalTime + ":00",
+      addFrom: fromDateTimeLocalFormat(flight.addFrom),
+      addUntil: fromDateTimeLocalFormat(flight.addUntil),
+    };
+    createMultipleFlight(formattedData)
+      .then((res) => {
+        getFlightsData().then((data) => {
+          setFlights(data.results);
+          toast.success(data.message);
+        });
+      })
+      .catch((err) => {
+        toast.error("Failed to create flight.");
+      });
+  };
+
   if (loading) {
     return (
       <Box
@@ -178,22 +201,29 @@ export default function Flights() {
           marginLeft: "10px",
         }}
       >
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex gap-2 mb-2">
           <Button
             variant="contained"
             onClick={() => setDialogOpen(true)}
             endIcon={<Add />}
           >
-            Create new flight
+            Create flight
           </Button>
           <Button
-            variant="outlined"
-            onClick={() => setIsFiltering(true)}
-            endIcon={<FilterAltOutlinedIcon />}
+            variant="contained"
+            onClick={() => setCreatingMultipleFlight(true)}
+            endIcon={<Add />}
           >
-            Filter flights
+            Create multiple
           </Button>
         </div>
+        <Button
+          variant="outlined"
+          onClick={() => setIsFiltering(true)}
+          endIcon={<FilterAltOutlinedIcon />}
+        >
+          Filter flights
+        </Button>
         {flights.length === 0 ? (
           <Box
             sx={{
@@ -229,7 +259,6 @@ export default function Flights() {
         )}
       </Box>
 
-      {/* Right-side flight details for desktop */}
       {!isMobile && (
         <Box
           sx={{
@@ -348,7 +377,6 @@ export default function Flights() {
           </Box>
         </Box>
       </Modal>
-      {/* Mobile modal for flight details */}
       {isMobile && (
         <Modal open={isModalOpen} onClose={handleCloseModal}>
           <Box
@@ -380,6 +408,13 @@ export default function Flights() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onCreate={handleCreate}
+        aircrafts={aircrafts}
+        airports={airports}
+      />
+      <CreateMultipleFlightDialog
+        open={creatingMultipleFlight}
+        onClose={() => setCreatingMultipleFlight(false)}
+        onCreate={handleCreateMultiple}
         aircrafts={aircrafts}
         airports={airports}
       />
