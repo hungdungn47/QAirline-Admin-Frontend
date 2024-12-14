@@ -45,9 +45,9 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
 
   // const destinationAirportCode = flight.destinationAirport.airportCode;
   // const originAirportCode = flight.originAirport.airportCode;
-  const [aircraft, setAircraft] = useState(flight.plane.id);
+  const [aircraft, setAircraft] = useState(flight.plane?.id);
 
-  const [inputAircraft, setInputAircraft] = useState(flight.plane.id);
+  const [inputAircraft, setInputAircraft] = useState(flight.plane?.id);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -67,10 +67,10 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
   useEffect(() => {
     setDepartureTime(initialDepartureTime);
     setArrivalTime(initialArrivalTime);
-    setAircraft(flight.plane.id);
+    setAircraft(flight.plane?.id);
 
     // Reset inputs when the flight changes
-    setInputAircraft(flight.plane.id);
+    setInputAircraft(flight.plane?.id);
     setIsEditing(false);
     setIsDelaying(false);
     setDelayTime(0);
@@ -218,7 +218,7 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           >
             <div>Aircraft: </div>
             <div className="font-bold text-xl">
-              {flight.plane.brand} {flight.plane.model}
+              {flight.plane?.brand} {flight.plane?.model}
             </div>
           </Box>
           <Box
@@ -369,7 +369,7 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           {!isEditing ? (
             <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {flight.plane.brand} {flight.plane.model}
+              {flight.plane?.brand} {flight.plane?.model}
             </Typography>
           ) : (
             <Select

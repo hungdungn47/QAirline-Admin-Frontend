@@ -83,12 +83,6 @@ export default function Login() {
           >
             Login
           </Button>
-          <span>
-            Don't have an account?{" "}
-            <Link to="/register" className="text-theme-primary underline">
-              Register
-            </Link>
-          </span>
         </Box>
       </Paper>
       <ToastContainer />

@@ -186,51 +186,58 @@ export default function Flights() {
   return (
     <Box
       sx={{
-        height: "calc(100vh - 69px)",
         display: "flex",
         alignItems: "start",
         overflowY: "hidden",
       }}
     >
-      {/* Left-side flight list */}
       <Box
         sx={{
-          height: "calc(100vh - 79px)",
           flex: "3",
           marginTop: "10px",
-          marginLeft: "10px",
         }}
       >
-        <div className="flex gap-2 mb-2">
+        <div
+          className={
+            isMobile
+              ? "justify-between gap-2 ml-2"
+              : "flex justify-between gap-2 ml-2"
+          }
+        >
+          <div className={isMobile ? "mb-2" : ""}>
+            <Button
+              sx={{ marginRight: 1 }}
+              variant="contained"
+              onClick={() => setDialogOpen(true)}
+              endIcon={<Add />}
+            >
+              Create flight
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => setCreatingMultipleFlight(true)}
+              endIcon={<Add />}
+            >
+              Create multiple
+            </Button>
+          </div>
           <Button
-            variant="contained"
-            onClick={() => setDialogOpen(true)}
-            endIcon={<Add />}
+            variant="outlined"
+            onClick={() => setIsFiltering(true)}
+            endIcon={<FilterAltOutlinedIcon />}
           >
-            Create flight
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => setCreatingMultipleFlight(true)}
-            endIcon={<Add />}
-          >
-            Create multiple
+            Filter flights
           </Button>
         </div>
-        <Button
-          variant="outlined"
-          onClick={() => setIsFiltering(true)}
-          endIcon={<FilterAltOutlinedIcon />}
-        >
-          Filter flights
-        </Button>
+
         {flights.length === 0 ? (
           <Box
             sx={{
               display: "flex",
+
               alignItems: "center",
               justifyContent: "center",
-              height: "80%",
+              // height: "80%",
             }}
           >
             <Typography>
@@ -240,11 +247,16 @@ export default function Flights() {
         ) : (
           <Box
             sx={{
-              height: "calc(100vh - 125px)",
+              marginTop: "10px",
+              height: `${
+                isMobile
+                  ? "calc(100vh - 64px - 110px)"
+                  : "calc(100vh - 64px - 60px)"
+              }`,
               overflowY: "auto",
             }}
           >
-            <Box sx={{ marginRight: "5px" }}>
+            <Box sx={{ marginX: "7px" }}>
               {flights.map((flight) => (
                 <FlightComponent
                   key={flight.id}
@@ -263,12 +275,18 @@ export default function Flights() {
         <Box
           sx={{
             flex: "2",
-            margin: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "calc(100vh - 64px)",
           }}
         >
           <Box
             sx={{
-              padding: 2,
+              width: "80%",
+              borderRadius: 2,
+              boxShadow: "0 0 10px rgba(140, 108, 184, 0.6)",
+              padding: 3,
             }}
           >
             {currentFlight ? (
@@ -403,7 +421,6 @@ export default function Flights() {
         </Modal>
       )}
 
-      {/* Create flight dialog */}
       <CreateFlightDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

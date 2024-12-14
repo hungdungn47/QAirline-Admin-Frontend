@@ -82,7 +82,7 @@ export default function CreateFlightDialog({
       maxWidth="sm"
       fullWidth
     >
-      <DialogTitle>Create New Flight</DialogTitle>
+      <DialogTitle>Create flight</DialogTitle>
       <DialogContent>
         <Box
           sx={{

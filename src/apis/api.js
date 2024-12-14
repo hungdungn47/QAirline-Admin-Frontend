@@ -88,7 +88,10 @@ export const createFlight = async (data) => {
 
 export const createMultipleFlight = async (data) => {
   try {
-    const response = await apiClient.post("/api/admin/v1/flights/add_batch", data);
+    const response = await apiClient.post(
+      "/api/admin/v1/flights/add_batch",
+      data
+    );
     return response.data.message;
   } catch (error) {
     throw error;
@@ -363,6 +366,17 @@ export const getCityOfAirport = async (airportId) => {
     );
     return response.data.results;
   } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAdminData = async () => {
+  try {
+    const response = await apiClient.get("/api/admin/v1/current_admin");
+    console.log(response);
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching current user");
     throw error;
   }
 };

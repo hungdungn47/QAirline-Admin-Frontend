@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -19,13 +19,15 @@ import Divider from "@mui/material/Divider";
 import { Link, useLocation } from "react-router-dom";
 import { useMediaQuery, useTheme } from "@mui/material";
 import Logo from "../../assets/QAirlineLogoFinal.png";
-
+import { useState } from "react";
+import { fetchAdminData } from "../../apis/api";
 const pages = ["Flights", "Aircrafts", "Tickets", "News"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Logout"];
 
 function NavBar() {
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [adminName, setAdminName] = useState("");
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -51,6 +53,12 @@ function NavBar() {
     }
     setDrawerOpen(open);
   };
+
+  useEffect(() => {
+    fetchAdminData().then((res) => {
+      setAdminName(res.username);
+    });
+  }, []);
 
   return (
     <AppBar color="white" position="static">
@@ -171,9 +179,17 @@ function NavBar() {
           {/* Profile Avatar */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
+              </IconButton> */}
+              {adminName && (
+                <Typography
+                  onClick={handleOpenUserMenu}
+                  sx={{ cursor: "pointer" }}
+                >
+                  Welcome <span className="font-bold">{adminName} &#9660;</span>
+                </Typography>
+              )}
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}

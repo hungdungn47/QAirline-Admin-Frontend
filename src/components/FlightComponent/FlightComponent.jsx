@@ -48,9 +48,9 @@ export default function FlightComponent({
     <Box
       sx={{
         marginBottom: "10px",
-        marginTop: "10px",
+        marginTop: "5px",
         borderRadius: "12px",
-        boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+        boxShadow: "0px 0px 8px rgba(140, 108, 184, 0.8)",
         backgroundColor: `${isSelected ? "white" : "white"}`,
         display: "flex",
         justifyContent: "space-around",
@@ -123,7 +123,7 @@ export default function FlightComponent({
           {flight.flightNumber}
         </Typography>
         <Typography color="primary" fontWeight="bold">
-          {plane.brand} {plane.model}
+          {plane?.brand} {plane?.model}
         </Typography>
         <Button
           onClick={() => handleOpenDetails(flight)}

@@ -3,13 +3,6 @@ import {
   Box,
   Typography,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -26,6 +19,8 @@ import {
 } from "../../apis/api";
 import { useMediaQuery } from "react-responsive";
 import AircraftComponent from "../../components/Aircraft/AircraftComponent";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Aircrafts() {
   const [aircrafts, setAircrafts] = useState([]);
@@ -81,10 +76,12 @@ export default function Aircrafts() {
     if (editMode) {
       updateAircraft({ ...formData, id: selectedAircraft.id }).then((res) => {
         loadAircrafts();
+        toast.success(res);
       });
     } else {
       createAircraft(formData).then((res) => {
         loadAircrafts();
+        toast.success(res);
       });
     }
 
@@ -124,6 +121,7 @@ export default function Aircrafts() {
     setAircrafts((prev) => prev.filter((aircraft) => aircraft.id !== id));
     deleteAircraft(id).then((res) => {
       loadAircrafts();
+      toast.success(res);
     });
   };
 
@@ -218,6 +216,7 @@ export default function Aircrafts() {
           </Button>
         </DialogActions>
       </Dialog>
+      <ToastContainer />
     </div>
   );
 }
