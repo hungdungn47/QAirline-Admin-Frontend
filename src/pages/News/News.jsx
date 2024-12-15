@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Autocomplete,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Typography,
   Button,
   Dialog,
@@ -15,12 +8,9 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Select,
-  MenuItem,
   Box,
   CircularProgress,
 } from "@mui/material";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -32,9 +22,17 @@ import {
   updateNews,
 } from "../../apis/api";
 import NewsComponent from "../../components/News/NewsComponent";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  newsAdded,
+  newsDeleted,
+  newsFetched,
+  newsUpdated,
+} from "../../app/newsSlice";
+import { v4 as uuidv4 } from "uuid";
 
 const News = () => {
-  const [newsList, setNewsList] = useState([]);
+  const newsList = useSelector((state) => state.news);
   const [openDialog, setOpenDialog] = useState(false);
   const [folderList, setFolderList] = useState([]);
   const [classificationList, setClassficationList] = useState([]);
@@ -52,6 +50,8 @@ const News = () => {
     currentNews.classification || ""
   );
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     fetchNews();
     fetchNewsFolderList();
@@ -59,8 +59,8 @@ const News = () => {
   }, []);
 
   const fetchNews = async () => {
-    const newsData = await fetchNewsApi(); // Fetching from fake API
-    setNewsList(newsData);
+    const newsData = await fetchNewsApi();
+    dispatch(newsFetched(newsData));
   };
 
   const fetchNewsFolderList = async () => {
@@ -110,12 +110,8 @@ const News = () => {
       delete currentNews.createdTime;
       updateNews(currentNews)
         .then((res) => {
-          setNewsList((prev) =>
-            prev.map((news) =>
-              news.id === currentNews.id ? { ...currentNews } : news
-            )
-          );
-          toast.success("res");
+          dispatch(newsUpdated(currentNews));
+          toast.success(res);
         })
         .catch((error) => {
           toast.error(error.response.data);
@@ -125,6 +121,8 @@ const News = () => {
       delete currentNews.id;
       createNews(currentNews)
         .then((res) => {
+          const tempId = uuidv4();
+          dispatch(newsAdded({ ...currentNews, id: tempId }));
           fetchNews();
           fetchNewsFolderList();
           fetchNewsClassificationList();
@@ -140,7 +138,8 @@ const News = () => {
   const handleDeleteNews = async (id) => {
     deleteNews(id)
       .then((res) => {
-        setNewsList((prev) => prev.filter((news) => news.id !== id));
+        // setNewsList((prev) => prev.filter((news) => news.id !== id));
+        dispatch(newsDeleted(id));
         toast.success(res);
       })
       .catch((error) => {

@@ -373,7 +373,6 @@ export const getCityOfAirport = async (airportId) => {
 export const fetchAdminData = async () => {
   try {
     const response = await apiClient.get("/api/admin/v1/current_admin");
-    console.log(response);
     return response.data.results;
   } catch (error) {
     console.error("Error fetching current user");

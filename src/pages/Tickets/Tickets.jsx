@@ -14,9 +14,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { getBooking, getCityOfAirport, getFlightById } from "../../apis/api";
+import { useSelector, useDispatch } from "react-redux";
+import { ticketsFetched } from "../../app/ticketsSlice";
 
 const Tickets = () => {
-  const [ticketsList, setTicketsList] = useState([]);
+  // const [ticketsList, setTicketsList] = useState([]);
+  const ticketsList = useSelector((state) => state.tickets);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [filters, setFilters] = useState({
     flightNumber: "",
@@ -26,6 +29,7 @@ const Tickets = () => {
     bookingTime: "",
     departureTime: "",
   });
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -47,7 +51,8 @@ const Tickets = () => {
           })
         );
 
-        setTicketsList(ticketsWithFlights); // Update state with enriched tickets
+        // setTicketsList(ticketsWithFlights); // Update state with enriched tickets
+        dispatch(ticketsFetched(ticketsWithFlights));
       } catch (error) {
         console.error("Error fetching tickets or flight data:", error);
       }

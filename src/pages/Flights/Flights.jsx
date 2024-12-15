@@ -27,9 +27,13 @@ import { fromDateTimeLocalFormat } from "../../utils/utils";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import { Add } from "@mui/icons-material";
 import CreateMultipleFlightDialog from "../../components/FlightComponent/CreateFlightDialog/CreateMultipleFlightDialog";
+import { useSelector, useDispatch } from "react-redux";
+import { flightsAdded, flightsFetched } from "../../app/flightsSlice";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Flights() {
-  const [flights, setFlights] = useState([]);
+  // const [flights, setFlights] = useState([]);
+  const flights = useSelector((state) => state.flights);
   const [currentFlight, setCurrentFlight] = useState(null); // Set initial value to null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +51,7 @@ export default function Flights() {
     departureTimeStart: "",
     departureTimeEnd: "",
   });
+  const dispatch = useDispatch();
 
   const fetchData = async () => {
     try {
@@ -56,7 +61,8 @@ export default function Flights() {
         navigate("/login");
       }
       const flightData = response.results;
-      setFlights(flightData);
+      // setFlights(flightData);
+      dispatch(flightsFetched(flightData));
       if (flightData.length > 0) {
         setCurrentFlight(flightData[0]); // Set the first flight as the default
       }
@@ -97,7 +103,8 @@ export default function Flights() {
     filterFlights(formattedFilters)
       .then((res) => {
         setIsFiltering(false);
-        setFlights(res);
+        // setFlights(res);
+        dispatch(flightsFetched(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -133,10 +140,13 @@ export default function Flights() {
       departureTime: fromDateTimeLocalFormat(flight.departureTime),
       arrivalTime: fromDateTimeLocalFormat(flight.arrivalTime),
     };
+    const tempId = uuidv4();
+    dispatch(flightsAdded({ ...formattedData, id: tempId }));
     createFlight(formattedData)
       .then((res) => {
         getFlightsData().then((data) => {
-          setFlights(data.results);
+          // setFlights(data.results);
+          dispatch(flightsFetched(data.results));
           toast.success("Flight created successfully!");
         });
       })
@@ -156,7 +166,8 @@ export default function Flights() {
     createMultipleFlight(formattedData)
       .then((res) => {
         getFlightsData().then((data) => {
-          setFlights(data.results);
+          // setFlights(data.results);
+          dispatch(flightsFetched(data));
           toast.success(data.message);
         });
       })
@@ -291,7 +302,7 @@ export default function Flights() {
           >
             {currentFlight ? (
               <FlightDetails
-                setFlights={setFlights}
+                setFlights={(flights) => dispatch(flightsFetched(flights))}
                 flightData={currentFlight}
                 aircrafts={aircrafts}
               />
@@ -412,7 +423,7 @@ export default function Flights() {
           >
             {currentFlight && (
               <FlightDetails
-                setFlights={setFlights}
+                setFlights={(flights) => dispatch(flightsFetched(flights))}
                 flightData={currentFlight}
                 aircrafts={aircrafts}
               />

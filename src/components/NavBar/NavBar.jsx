@@ -178,19 +178,17 @@ function NavBar() {
 
           {/* Profile Avatar */}
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+            {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton> */}
-              {adminName && (
-                <Typography
-                  onClick={handleOpenUserMenu}
-                  sx={{ cursor: "pointer" }}
-                >
-                  Welcome <span className="font-bold">{adminName} &#9660;</span>
-                </Typography>
-              )}
-            </Tooltip>
+            {adminName && (
+              <Typography
+                onClick={handleOpenUserMenu}
+                sx={{ cursor: "pointer" }}
+              >
+                Welcome <span className="font-bold">{adminName} &#9660;</span>
+              </Typography>
+            )}
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"

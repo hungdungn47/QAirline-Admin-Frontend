@@ -21,9 +21,18 @@ import { useMediaQuery } from "react-responsive";
 import AircraftComponent from "../../components/Aircraft/AircraftComponent";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  aircraftsAdded,
+  aircraftsDeleted,
+  aircraftsFetched,
+  aircraftsUpdated,
+} from "../../app/aircraftsSlice";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Aircrafts() {
-  const [aircrafts, setAircrafts] = useState([]);
+  // const [aircrafts, setAircrafts] = useState([]);
+  const aircrafts = useSelector((state) => state.aircrafts);
   const [openDialog, setOpenDialog] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedAircraft, setSelectedAircraft] = useState(null);
@@ -35,17 +44,18 @@ export default function Aircrafts() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
   const loadAircrafts = async () => {
     try {
       const data = await fetchAircrafts();
-      setAircrafts(data);
+      // setAircrafts(data);
+      dispatch(aircraftsFetched(data));
     } catch (err) {
       setErrors("Failed to load aircraft data.");
     } finally {
       setLoading(false);
     }
   };
-  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   useEffect(() => {
     loadAircrafts();
   }, []);
@@ -74,11 +84,14 @@ export default function Aircrafts() {
     }
 
     if (editMode) {
+      dispatch(aircraftsUpdated({ ...formData, id: selectedAircraft.id }));
       updateAircraft({ ...formData, id: selectedAircraft.id }).then((res) => {
-        loadAircrafts();
+        // loadAircrafts();
         toast.success(res);
       });
     } else {
+      const tempId = uuidv4();
+      dispatch(aircraftsAdded({ ...formData, id: tempId }));
       createAircraft(formData).then((res) => {
         loadAircrafts();
         toast.success(res);
@@ -118,9 +131,10 @@ export default function Aircrafts() {
 
   // Delete aircraft
   const handleDelete = (id) => {
-    setAircrafts((prev) => prev.filter((aircraft) => aircraft.id !== id));
+    // setAircrafts((prev) => prev.filter((aircraft) => aircraft.id !== id));
+    dispatch(aircraftsDeleted(id));
     deleteAircraft(id).then((res) => {
-      loadAircrafts();
+      // loadAircrafts();
       toast.success(res);
     });
   };

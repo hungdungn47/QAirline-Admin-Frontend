@@ -5,6 +5,8 @@ import App from "./App.jsx";
 import { experimental_extendTheme as extendTheme } from "@mui/material/styles";
 import { Experimental_CssVarsProvider as CssVarsProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
 
 const theme = extendTheme({
   typography: {
@@ -49,7 +51,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <CssVarsProvider theme={theme}>
       <CssBaseline />
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </CssVarsProvider>
   </StrictMode>
 );
