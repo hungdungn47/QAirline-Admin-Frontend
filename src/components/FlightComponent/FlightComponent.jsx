@@ -30,6 +30,7 @@ export default function FlightComponent({
   let delayedDepartureTime = flight.delayedDepartureTime;
   let delayedArrivalTime = "";
   const isSelected = flight.id === currentFlight.id;
+  const isAvailable = flight.available;
 
   if (delayedDepartureTime !== null) {
     delayedArrivalTime = format(
@@ -49,12 +50,15 @@ export default function FlightComponent({
       sx={{
         marginBottom: "10px",
         marginTop: "5px",
-        borderRadius: "12px",
-        boxShadow: "0px 0px 8px rgba(140, 108, 184, 0.8)",
-        backgroundColor: `${isSelected ? "white" : "white"}`,
+
+        boxShadow: "0px 0px 6px rgba(0, 0, 0, 0.5)",
+        backgroundColor: `${
+          isAvailable ? "white" : "rgba(255, 220, 179, 0.5)"
+        }`,
         display: "flex",
         justifyContent: "space-around",
-        border: `${isSelected ? "3px solid #69548D" : "none"}`,
+        border: `${isSelected ? "3px solid #995EFF" : "transparent"}`,
+        borderRadius: "12px",
         alignItems: "center",
       }}
     >
@@ -122,9 +126,16 @@ export default function FlightComponent({
         <Typography color="primary" fontWeight="bold">
           {flight.flightNumber}
         </Typography>
-        <Typography color="primary" fontWeight="bold">
-          {plane?.brand} {plane?.model}
-        </Typography>
+        {plane ? (
+          <Typography color="primary" fontWeight="bold">
+            {plane.brand} {plane.model}
+          </Typography>
+        ) : (
+          <Typography color="warning" fontWeight="bold">
+            Unassigned aircraft
+          </Typography>
+        )}
+
         <Button
           onClick={() => handleOpenDetails(flight)}
           variant={isSelected ? "outlined" : "contained"}

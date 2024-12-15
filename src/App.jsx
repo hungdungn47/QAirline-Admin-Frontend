@@ -38,7 +38,8 @@ function App() {
             }
           >
             {/* <Route index element={<Home />} /> */}
-            <Route index element={<Flights />} />
+            <Route index element={<Navigate to="flights" replace />} />
+            <Route path="flights" element={<Flights />} />
             <Route path="tickets" element={<Tickets />} />
             <Route path="aircrafts" element={<Aircrafts />} />
             <Route path="news" element={<News />} />

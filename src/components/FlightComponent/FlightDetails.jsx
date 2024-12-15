@@ -176,7 +176,9 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
             <div>{format(arrivalTime, "dd/MM/yyyy")}</div>
           </Box>
         </Box>
-        <Typography color="error">This flight is closed!</Typography>
+        <Typography color="error" fontWeight="bold">
+          This flight is closed!
+        </Typography>
         <div className="text-gray-400 !important">
           {flight.delayed ? (
             <>
@@ -188,9 +190,9 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
                 }}
               >
                 <Typography>Scheduled departure time: </Typography>
-                <Typography color="primary" fontWeight="bold" fontSize="20px">
+                <div className="font-bold text-xl">
                   {format(parseDateTime(flight.departureTime), "HH:mm dd/MM")}
-                </Typography>
+                </div>
               </Box>
               <Box
                 sx={{
@@ -200,12 +202,12 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
                 }}
               >
                 <Typography>Delayed until: </Typography>
-                <Typography color="primary" fontWeight="bold" fontSize="20px">
+                <div className="font-bold text-xl">
                   {format(
                     parseDateTime(flight.delayedDepartureTime),
                     "HH:mm dd/MM"
                   )}
-                </Typography>
+                </div>
               </Box>
             </>
           ) : null}
@@ -217,9 +219,13 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
             }}
           >
             <div>Aircraft: </div>
-            <div className="font-bold text-xl">
-              {flight.plane?.brand} {flight.plane?.model}
-            </div>
+            {flight.plane ? (
+              <div className="font-bold text-xl">
+                {flight.plane?.brand} {flight.plane?.model}
+              </div>
+            ) : (
+              <div className="font-bold text-lg">Aircraft not assigned!</div>
+            )}
           </Box>
           <Box
             sx={{
@@ -234,7 +240,6 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           <Box
             sx={{
               display: "flex",
-              gap: 2,
               alignItems: "center",
               justifyContent: "space-between",
             }}
@@ -326,151 +331,159 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           </div>
         </Box>
       </Box>
-      {flight.delayed ? (
-        <>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography>Scheduled departure time: </Typography>
-            <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {format(parseDateTime(flight.departureTime), "HH:mm dd/MM")}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography>Delayed until: </Typography>
-            <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {format(
-                parseDateTime(flight.delayedDepartureTime),
-                "HH:mm dd/MM"
-              )}
-            </Typography>
-          </Box>
-        </>
-      ) : null}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        <Typography>Aircraft: </Typography>
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          {!isEditing ? (
-            <Typography color="primary" fontWeight="bold" fontSize="20px">
-              {flight.plane?.brand} {flight.plane?.model}
-            </Typography>
-          ) : (
-            <Select
-              sx={{ height: "3rem" }}
-              onChange={(e) => {
-                setInputAircraft(e.target.value);
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+        {flight.delayed ? (
+          <>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
-              value={inputAircraft}
             >
-              {aircrafts.map((aircraft) => {
-                return (
-                  <MenuItem key={aircraft.id} value={aircraft.id}>
-                    {aircraft.brand} {aircraft.model}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          )}
-          {isEditing ? (
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setIsEditing(false);
-                  changeFlightAircraft(flight, inputAircraft)
-                    .then((message) => {
-                      toast.success(message);
-                      setAircraft(inputAircraft);
-                      fetchFlightData();
-                      getFlightsData().then((res) => {
-                        setFlights(res.results);
-                      });
-                    })
-                    .catch((err) => {
-                      toast.error(err);
-                    });
-                }}
-              >
-                Apply
-              </Button>
-              <Button variant="outlined" color="warning" onClick={handleCancel}>
-                Cancel
-              </Button>
+              <Typography>Scheduled departure time: </Typography>
+              <Typography color="primary" fontWeight="bold" fontSize="20px">
+                {format(parseDateTime(flight.departureTime), "HH:mm dd/MM")}
+              </Typography>
             </Box>
-          ) : null}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography>Delayed until: </Typography>
+              <Typography color="primary" fontWeight="bold" fontSize="20px">
+                {format(
+                  parseDateTime(flight.delayedDepartureTime),
+                  "HH:mm dd/MM"
+                )}
+              </Typography>
+            </Box>
+          </>
+        ) : null}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 1,
+            alignItems: "center",
+          }}
+        >
+          <Typography>Aircraft: </Typography>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            {!isEditing ? (
+              flight.plane ? (
+                <Typography color="primary" fontWeight="bold" fontSize="20px">
+                  {flight.plane.brand} {flight.plane.model}
+                </Typography>
+              ) : (
+                <Typography color="warning" fontWeight="bold" fontSize="1.1rem">
+                  Aircraft not assigned!
+                </Typography>
+              )
+            ) : (
+              <Select
+                sx={{ height: "3rem" }}
+                onChange={(e) => {
+                  setInputAircraft(e.target.value);
+                }}
+                value={inputAircraft}
+              >
+                {aircrafts.map((aircraft) => {
+                  return (
+                    <MenuItem key={aircraft.id} value={aircraft.id}>
+                      {aircraft.brand} {aircraft.model}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            )}
+            {isEditing ? (
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setIsEditing(false);
+                    changeFlightAircraft(flight, inputAircraft)
+                      .then((message) => {
+                        toast.success(message);
+                        setAircraft(inputAircraft);
+                        fetchFlightData();
+                        getFlightsData().then((res) => {
+                          setFlights(res.results);
+                        });
+                      })
+                      .catch((err) => {
+                        toast.error(err);
+                      });
+                  }}
+                >
+                  Apply
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="warning"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            ) : null}
+          </Box>
         </Box>
-      </Box>
 
-      {/* Economy Price */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography>Economy price: </Typography>
-        <Typography color="primary" fontWeight="bold" fontSize="20px">
-          {flight.economyPrice} $
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography>Business price: </Typography>
-        <Typography color="primary" fontWeight="bold" fontSize="20px">
-          {flight.businessPrice} $
-        </Typography>
-      </Box>
+        {/* Economy Price */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>Economy price: </Typography>
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {flight.economyPrice} $
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>Business price: </Typography>
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {flight.businessPrice} $
+          </Typography>
+        </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography>Economy seats left: </Typography>
-        <Typography color="primary" fontWeight="bold" fontSize="20px">
-          {flight.availableEconomySeats}
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography>Business seats left: </Typography>
-        <Typography color="primary" fontWeight="bold" fontSize="20px">
-          {flight.availableBusinessSeats}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>Economy seats left: </Typography>
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {flight.availableEconomySeats}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>Business seats left: </Typography>
+          <Typography color="primary" fontWeight="bold" fontSize="20px">
+            {flight.availableBusinessSeats}
+          </Typography>
+        </Box>
       </Box>
       {/* Editing Buttons */}
 
@@ -527,7 +540,7 @@ export default function FlightDetails({ setFlights, flightData, aircrafts }) {
           color="error"
           onClick={handleCloseFlight}
         >
-          Close
+          Close flight
         </Button>
       </Box>
     </Box>

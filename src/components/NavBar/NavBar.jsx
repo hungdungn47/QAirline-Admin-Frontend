@@ -21,7 +21,9 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import Logo from "../../assets/QAirlineLogoFinal.png";
 import { useState } from "react";
 import { fetchAdminData } from "../../apis/api";
-const pages = ["Flights", "Aircrafts", "Tickets", "News"];
+import { motion } from "framer-motion";
+
+const pages = ["flights", "aircrafts", "tickets", "news"];
 const settings = ["Logout"];
 
 function NavBar() {
@@ -56,7 +58,7 @@ function NavBar() {
 
   useEffect(() => {
     fetchAdminData().then((res) => {
-      setAdminName(res.username);
+      setAdminName(res.firstName);
     });
   }, []);
 
@@ -106,29 +108,38 @@ function NavBar() {
                           to={`/dashboard/${page}`}
                           key={page}
                           style={{
-                            textDecoration: "none",
                             color: isActive
                               ? theme.palette.primary.main
                               : "inherit",
                           }}
                         >
                           <ListItem>
-                            <ListItemText primary={page} />
+                            <ListItemText
+                              sx={{
+                                textTransform: "capitalize",
+                                fontSize: "12px",
+                              }}
+                              primary={page}
+                            />
                           </ListItem>
                         </Link>
                       );
                     })}
                   </List>
                   <Divider />
+
                   <List>
-                    {settings.map((setting) => (
-                      <ListItem
-                        key={setting}
-                        onClick={() => handleCloseUserMenu(setting)}
+                    <ListItem>
+                      <Typography
+                        onClick={handleOpenUserMenu}
+                        sx={{ cursor: "pointer" }}
                       >
-                        <ListItemText primary={setting} />
-                      </ListItem>
-                    ))}
+                        Welcome <span className="font-bold">{adminName}</span>
+                      </Typography>
+                    </ListItem>
+                    <ListItem onClick={() => handleCloseUserMenu("Logout")}>
+                      <Button variant="contained">Log out</Button>
+                    </ListItem>
                   </List>
                 </Box>
               </Drawer>
@@ -146,77 +157,85 @@ function NavBar() {
                 const isOnFlight = page === "Flights";
                 const isActive = !isOnFlight
                   ? location.pathname === `/dashboard/${page}`
-                  : location.pathname === `/dashboard`;
+                  : location.pathname === `/dashboard/flights` ||
+                    location.pathname === `/dashboard/Flights`;
                 return (
                   <Link
                     to={`/dashboard/${page}`}
+                    style={{
+                      height: "64px",
+                      display: "flex",
+                      alignItems: "end",
+                    }}
                     key={page}
-                    style={{ textDecoration: "none" }}
                   >
-                    <Button
+                    <motion.div
                       key={page}
-                      sx={{
-                        fontSize: "1.2rem",
-                        height: "100%",
-                        display: "block",
-                        backgroundColor: isActive ? "primary.main" : "inherit",
+                      animate={{
+                        height: isActive ? 54 : 45,
+                        backgroundColor: isActive ? "#69548d" : "inherit",
                         color: isActive ? "white" : "inherit",
-                        "&:hover": {
-                          backgroundColor: isActive
-                            ? "primary.main"
-                            : "rgba(0, 0, 0, 0.08)",
-                        },
+                      }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{
+                        textTransform: "capitalize",
+                        fontSize: "1rem",
+                        height: "50px",
+                        borderRadius: "10px 10px 0 0",
+                        width: "100px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
                       }}
                     >
                       {page}
-                    </Button>
+                    </motion.div>
                   </Link>
                 );
               })}
             </Box>
           )}
 
-          {/* Profile Avatar */}
-          <Box sx={{ flexGrow: 0 }}>
-            {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton> */}
-            {adminName && (
-              <Typography
-                onClick={handleOpenUserMenu}
-                sx={{ cursor: "pointer" }}
-              >
-                Welcome <span className="font-bold">{adminName} &#9660;</span>
-              </Typography>
-            )}
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem
-                  key={setting}
-                  onClick={() => handleCloseUserMenu(setting)}
+          {!isMobile && (
+            <Box sx={{ flexGrow: 0 }}>
+              {adminName && (
+                <Typography
+                  onClick={handleOpenUserMenu}
+                  sx={{ cursor: "pointer" }}
                 >
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+                  Welcome <span className="font-bold">{adminName} &#9660;</span>
+                </Typography>
+              )}
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem
+                    key={setting}
+                    onClick={() => handleCloseUserMenu(setting)}
+                  >
+                    <Typography sx={{ textAlign: "center" }}>
+                      {setting}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          )}
         </Toolbar>
       </Container>
     </AppBar>

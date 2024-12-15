@@ -21,7 +21,7 @@ const theme = extendTheme({
           main: "#69548d",
         },
         secondary: {
-          main: "#3f51b5",
+          main: "#995EFF",
         },
       },
     },

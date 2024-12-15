@@ -30,13 +30,13 @@ import CreateMultipleFlightDialog from "../../components/FlightComponent/CreateF
 import { useSelector, useDispatch } from "react-redux";
 import { flightsAdded, flightsFetched } from "../../app/flightsSlice";
 import { v4 as uuidv4 } from "uuid";
+import { setCurrentFlight } from "../../app/flightInfoSlice";
 
 export default function Flights() {
   // const [flights, setFlights] = useState([]);
   const flights = useSelector((state) => state.flights);
-  const [currentFlight, setCurrentFlight] = useState(null); // Set initial value to null
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // const [currentFlight, setCurrentFlight] = useState(null); // Set initial value to null
+  const currentFlight = useSelector((state) => state.flightInfo.currentFlight);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creatingMultipleFlight, setCreatingMultipleFlight] = useState(false);
   const [aircrafts, setAircrafts] = useState([]);
@@ -55,7 +55,6 @@ export default function Flights() {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const response = await getFlightsData();
       if (response.code === 401) {
         navigate("/login");
@@ -64,7 +63,8 @@ export default function Flights() {
       // setFlights(flightData);
       dispatch(flightsFetched(flightData));
       if (flightData.length > 0) {
-        setCurrentFlight(flightData[0]); // Set the first flight as the default
+        dispatch(setCurrentFlight(flightData[0]));
+        // setCurrentFlight(flightData[0]); // Set the first flight as the default
       }
       const aircraftData = await fetchAircrafts();
       setAircrafts(aircraftData);
@@ -72,10 +72,7 @@ export default function Flights() {
       const airportData = await fetchAirports();
       setAirports(airportData);
     } catch (err) {
-      setError("Failed to fetch flights data.");
       toast.error("Failed to fetch flights data.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -122,7 +119,8 @@ export default function Flights() {
   };
 
   const handleOpenDetails = (flight) => {
-    setCurrentFlight(flight);
+    // setCurrentFlight(flight);
+    dispatch(setCurrentFlight(flight));
     if (isMobile) setIsModalOpen(true); // Open modal for mobile
   };
 
@@ -176,7 +174,7 @@ export default function Flights() {
       });
   };
 
-  if (loading) {
+  if (flights.length === 0) {
     return (
       <Box
         sx={{
@@ -271,7 +269,9 @@ export default function Flights() {
               {flights.map((flight) => (
                 <FlightComponent
                   key={flight.id}
-                  setCurrentFlight={setCurrentFlight}
+                  setCurrentFlight={(flight) =>
+                    dispatch(setCurrentFlight(flight))
+                  }
                   handleOpenDetails={handleOpenDetails}
                   currentFlight={currentFlight}
                   flight={flight}
