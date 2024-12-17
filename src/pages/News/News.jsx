@@ -36,6 +36,7 @@ const News = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [folderList, setFolderList] = useState([]);
   const [classificationList, setClassficationList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentNews, setCurrentNews] = useState({
     id: null,
     imageUrl: "",
@@ -53,9 +54,13 @@ const News = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchNews();
-    fetchNewsFolderList();
-    fetchNewsClassificationList();
+    Promise.all([
+      fetchNews(),
+      fetchNewsFolderList(),
+      fetchNewsClassificationList(),
+    ]).then((res) => {
+      setLoading(false);
+    });
   }, []);
 
   const fetchNews = async () => {
@@ -152,7 +157,7 @@ const News = () => {
     setCurrentNews((prev) => ({ ...prev, [name]: value }));
   };
 
-  if (newsList.length === 0) {
+  if (loading) {
     return (
       <Box
         sx={{
@@ -166,6 +171,27 @@ const News = () => {
       >
         <CircularProgress />
         <Typography>Loading news...</Typography>
+      </Box>
+    );
+  }
+
+  if (newsList.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: `calc(100vh - 64px)`,
+          // width: "100vw",
+        }}
+      >
+        <Typography
+          sx={{ fontSize: "2rem", fontWeight: "bold" }}
+          color="warning"
+        >
+          News list is empty
+        </Typography>
       </Box>
     );
   }
