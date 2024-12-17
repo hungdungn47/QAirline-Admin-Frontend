@@ -21,6 +21,7 @@ const Tickets = () => {
   // const [ticketsList, setTicketsList] = useState([]);
   const ticketsList = useSelector((state) => state.tickets);
   const [filteredTickets, setFilteredTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     flightNumber: "",
     origin: "",
@@ -58,7 +59,9 @@ const Tickets = () => {
       }
     };
 
-    fetchTickets();
+    fetchTickets().then((res) => {
+      setLoading(false);
+    });
   }, []);
 
   // Filter tickets based on criteria
@@ -126,7 +129,7 @@ const Tickets = () => {
     });
   };
 
-  if (ticketsList.length === 0) {
+  if (loading) {
     return (
       <Box
         sx={{
@@ -140,6 +143,27 @@ const Tickets = () => {
       >
         <CircularProgress />
         <Typography>Loading tickets...</Typography>
+      </Box>
+    );
+  }
+
+  if (ticketsList.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: `calc(100vh - 64px)`,
+          // width: "100vw",
+        }}
+      >
+        <Typography
+          sx={{ fontSize: "2rem", fontWeight: "bold" }}
+          color="warning"
+        >
+          There is no booked ticket!
+        </Typography>
       </Box>
     );
   }

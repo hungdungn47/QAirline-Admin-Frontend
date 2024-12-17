@@ -37,6 +37,7 @@ export default function Flights() {
   const flights = useSelector((state) => state.flights);
   // const [currentFlight, setCurrentFlight] = useState(null); // Set initial value to null
   const currentFlight = useSelector((state) => state.flightInfo.currentFlight);
+  const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creatingMultipleFlight, setCreatingMultipleFlight] = useState(false);
   const [aircrafts, setAircrafts] = useState([]);
@@ -129,7 +130,10 @@ export default function Flights() {
   };
 
   useEffect(() => {
-    fetchData();
+    setLoading(true);
+    fetchData().then((res) => {
+      setLoading(false);
+    });
   }, []);
 
   const handleCreate = (flight) => {
@@ -174,7 +178,7 @@ export default function Flights() {
       });
   };
 
-  if (flights.length === 0) {
+  if (loading) {
     return (
       <Box
         sx={{
@@ -191,6 +195,24 @@ export default function Flights() {
       </Box>
     );
   }
+  // if (flights.length === 0) {
+  //   return (
+  //     <Box
+  //       sx={{
+  //         display: "flex",
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         height: "100vh",
+  //         width: "100vw",
+  //         gap: 2,
+  //       }}
+  //     >
+  //       <Typography sx={{ fontWeight: "bold" }} color="primary">
+  //         There is no available flights!
+  //       </Typography>
+  //     </Box>
+  //   );
+  // }
 
   return (
     <Box
@@ -246,11 +268,18 @@ export default function Flights() {
 
               alignItems: "center",
               justifyContent: "center",
-              // height: "80%",
+              height: `${
+                isMobile
+                  ? "calc(100vh - 64px - 110px)"
+                  : "calc(100vh - 64px - 60px)"
+              }`,
             }}
           >
-            <Typography>
-              There is no flights satisfying current condition!
+            <Typography
+              sx={{ fontSize: "2rem", fontWeight: "bold" }}
+              color="warning"
+            >
+              There is no available flights!
             </Typography>
           </Box>
         ) : (
@@ -282,7 +311,7 @@ export default function Flights() {
         )}
       </Box>
 
-      {!isMobile && (
+      {!isMobile && flights.length > 0 && (
         <Box
           sx={{
             flex: "2",

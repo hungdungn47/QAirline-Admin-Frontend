@@ -139,7 +139,7 @@ export default function Aircrafts() {
     });
   };
 
-  if (aircrafts.length === 0) {
+  if (loading) {
     return (
       <Box
         sx={{
@@ -153,6 +153,27 @@ export default function Aircrafts() {
       >
         <CircularProgress />
         <Typography>Loading aircrafts...</Typography>
+      </Box>
+    );
+  }
+
+  if (aircrafts.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: `calc(100vh - 64px)`,
+          // width: "100vw",
+        }}
+      >
+        <Typography
+          sx={{ fontSize: "2rem", fontWeight: "bold" }}
+          color="warning"
+        >
+          There is no aircrafts!
+        </Typography>
       </Box>
     );
   }
