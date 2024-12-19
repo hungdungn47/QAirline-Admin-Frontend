@@ -127,10 +127,10 @@ const News = () => {
     } else {
       console.log("Creating news: ", currentNews);
       delete currentNews.id;
+      const tempId = uuidv4();
+      dispatch(newsAdded({ ...currentNews, id: tempId }));
       createNews(currentNews)
         .then((res) => {
-          const tempId = uuidv4();
-          dispatch(newsAdded({ ...currentNews, id: tempId }));
           fetchNews();
           fetchNewsFolderList();
           fetchNewsClassificationList();
