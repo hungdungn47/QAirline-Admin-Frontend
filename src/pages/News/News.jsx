@@ -36,7 +36,7 @@ const News = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [folderList, setFolderList] = useState([]);
   const [classificationList, setClassficationList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [currentNews, setCurrentNews] = useState({
     id: null,
     imageUrl: "",
@@ -54,6 +54,9 @@ const News = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (newsList.length === 0) {
+      setLoading(true);
+    }
     Promise.all([
       fetchNews(),
       fetchNewsFolderList(),

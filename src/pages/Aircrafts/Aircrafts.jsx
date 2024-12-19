@@ -43,12 +43,11 @@ export default function Aircrafts() {
     numOfBusinessSeats: 0,
   });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const loadAircrafts = async () => {
     try {
       const data = await fetchAircrafts();
-      // setAircrafts(data);
       dispatch(aircraftsFetched(data));
     } catch (err) {
       setErrors("Failed to load aircraft data.");
@@ -57,9 +56,9 @@ export default function Aircrafts() {
     }
   };
   useEffect(() => {
+    if (aircrafts.length === 0) setLoading(true);
     loadAircrafts();
   }, []);
-  // Handle form input changes
 
   const handleChange = (e) => {
     const { name, value } = e.target;

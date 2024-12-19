@@ -61,11 +61,9 @@ export default function Flights() {
         navigate("/login");
       }
       const flightData = response.results;
-      // setFlights(flightData);
       dispatch(flightsFetched(flightData));
       if (flightData.length > 0) {
         dispatch(setCurrentFlight(flightData[0]));
-        // setCurrentFlight(flightData[0]); // Set the first flight as the default
       }
       const aircraftData = await fetchAircrafts();
       setAircrafts(aircraftData);
@@ -97,16 +95,16 @@ export default function Flights() {
       }
     });
 
-    setLoading(true);
     filterFlights(formattedFilters)
       .then((res) => {
         setIsFiltering(false);
-        // setFlights(res);
         dispatch(flightsFetched(res));
-        setLoading(false);
       })
       .catch((err) => {
         toast.error("Could not filter flights");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
   const handleResetFilters = () => {
@@ -130,7 +128,7 @@ export default function Flights() {
   };
 
   useEffect(() => {
-    setLoading(true);
+    if (flights.length === 0) setLoading(true);
     fetchData().then((res) => {
       setLoading(false);
     });
@@ -195,24 +193,6 @@ export default function Flights() {
       </Box>
     );
   }
-  // if (flights.length === 0) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         height: "100vh",
-  //         width: "100vw",
-  //         gap: 2,
-  //       }}
-  //     >
-  //       <Typography sx={{ fontWeight: "bold" }} color="primary">
-  //         There is no available flights!
-  //       </Typography>
-  //     </Box>
-  //   );
-  // }
 
   return (
     <Box

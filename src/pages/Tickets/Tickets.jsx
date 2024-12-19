@@ -18,10 +18,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { ticketsFetched } from "../../app/ticketsSlice";
 
 const Tickets = () => {
-  // const [ticketsList, setTicketsList] = useState([]);
   const ticketsList = useSelector((state) => state.tickets);
   const [filteredTickets, setFilteredTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     flightNumber: "",
     origin: "",
@@ -35,36 +34,31 @@ const Tickets = () => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const data = await getBooking(); // Fetch initial ticket data
+        const data = await getBooking();
 
-        // Fetch flight data for each ticket using Promise.all
-        const ticketsWithFlights = await Promise.all(
-          data.map(async (ticket) => {
-            if (ticket.flight?.id) {
-              const flight = await getFlightById(ticket.flight.id);
-              return {
-                ...ticket,
-                origin: flight.originAirport.city.cityName,
-                destination: flight.destinationAirport.city.cityName,
-              };
-            }
-            return ticket;
-          })
-        );
+        const ticketsWithFlights = data.map((ticket) => {
+          if (ticket?.flight) {
+            return {
+              ...ticket,
+              origin: ticket.flight.originAirport.city.cityName,
+              destination: ticket.flight.destinationAirport.city.cityName,
+            };
+          }
+          return ticket;
+        });
 
-        // setTicketsList(ticketsWithFlights); // Update state with enriched tickets
         dispatch(ticketsFetched(ticketsWithFlights));
       } catch (error) {
         console.error("Error fetching tickets or flight data:", error);
       }
     };
 
+    if (ticketsList.length === 0) setLoading(true);
     fetchTickets().then((res) => {
       setLoading(false);
     });
   }, []);
 
-  // Filter tickets based on criteria
   useEffect(() => {
     let filtered = ticketsList;
 
@@ -94,14 +88,12 @@ const Tickets = () => {
 
     if (filters.departureTime) {
       filtered = filtered.filter((ticket) => {
-        // Extract the date part from delayedDepartureTime (dd/MM/yyyy)
         const departureDate =
-          ticket.flight?.delayedDepartureTime?.split(" ")[0]; // Getting the date part (dd/MM/yyyy)
+          ticket.flight?.delayedDepartureTime?.split(" ")[0];
 
         const departureDateSplitted = departureDate.split("/");
         const filterDateSplitted = filters.departureTime.split("-");
 
-        // Compare the extracted date with filters.departureTime
         return (
           departureDateSplitted[0] === filterDateSplitted[2] &&
           departureDateSplitted[1] === filterDateSplitted[1] &&
