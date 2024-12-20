@@ -37,6 +37,11 @@ Dự án sử dụng những công nghệ / framework / thư viện sau:
 - ReactJS
 - Material UI
 - Tailwind CSS
+- Axios
+- Framer motion
+- React toastify
+- React router DOM
+- Redux
 
 Look and feel của trang web được thiết lập bằng cách đặt lại các màu chủ đề cho theme của tailwind CSS và theme của Material UI.
 
