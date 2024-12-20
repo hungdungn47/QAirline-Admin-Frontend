@@ -140,12 +140,9 @@ export default function Flights() {
       departureTime: fromDateTimeLocalFormat(flight.departureTime),
       arrivalTime: fromDateTimeLocalFormat(flight.arrivalTime),
     };
-    const tempId = uuidv4();
-    dispatch(flightsAdded({ ...formattedData, id: tempId }));
     createFlight(formattedData)
       .then((res) => {
         getFlightsData().then((data) => {
-          // setFlights(data.results);
           dispatch(flightsFetched(data.results));
           toast.success("Flight created successfully!");
         });
@@ -166,9 +163,9 @@ export default function Flights() {
     createMultipleFlight(formattedData)
       .then((res) => {
         getFlightsData().then((data) => {
-          // setFlights(data.results);
-          dispatch(flightsFetched(data));
-          toast.success(data.message);
+          console.log(data);
+          dispatch(flightsFetched(data.results));
+          toast.success(res);
         });
       })
       .catch((err) => {
@@ -241,7 +238,7 @@ export default function Flights() {
           </Button>
         </div>
 
-        {flights.length === 0 ? (
+        {flights !== null && flights.length === 0 ? (
           <Box
             sx={{
               display: "flex",
@@ -263,31 +260,36 @@ export default function Flights() {
             </Typography>
           </Box>
         ) : (
-          <Box
-            sx={{
-              marginTop: "10px",
-              height: `${
-                isMobile
-                  ? "calc(100vh - 64px - 110px)"
-                  : "calc(100vh - 64px - 60px)"
-              }`,
-              overflowY: "auto",
-            }}
-          >
-            <Box sx={{ marginX: "7px" }}>
-              {flights.map((flight) => (
-                <FlightComponent
-                  key={flight.id}
-                  setCurrentFlight={(flight) =>
-                    dispatch(setCurrentFlight(flight))
-                  }
-                  handleOpenDetails={handleOpenDetails}
-                  currentFlight={currentFlight}
-                  flight={flight}
-                />
-              ))}
+          flights && (
+            <Box
+              sx={{
+                marginTop: "10px",
+                height: `${
+                  isMobile
+                    ? "calc(100vh - 64px - 110px)"
+                    : "calc(100vh - 64px - 60px)"
+                }`,
+                overflowY: "auto",
+              }}
+            >
+              <Box sx={{ marginX: "7px" }}>
+                {flights.map((flight) => {
+                  if (flight)
+                    return (
+                      <FlightComponent
+                        key={flight.id}
+                        setCurrentFlight={(flight) =>
+                          dispatch(setCurrentFlight(flight))
+                        }
+                        handleOpenDetails={handleOpenDetails}
+                        currentFlight={currentFlight}
+                        flight={flight}
+                      />
+                    );
+                })}
+              </Box>
             </Box>
-          </Box>
+          )
         )}
       </Box>
 

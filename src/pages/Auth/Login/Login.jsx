@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginApi } from "../../../apis/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import backgroundImage from "../../../assets/background.jpg";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -40,7 +41,8 @@ export default function Login() {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        backgroundColor: "#f5f5f5",
+        // backgroundColor: "#f5f5f5",
+        background: `url(${backgroundImage})`,
       }}
     >
       <Paper
