@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
 import { forgotPasswordApi } from "../../../apis/api";
+import backgroundImage from "../../../assets/background.jpg";
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState("");
@@ -38,6 +39,7 @@ export default function ForgetPassword() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        background: `url(${backgroundImage})`,
       }}
     >
       <Box
@@ -47,6 +49,7 @@ export default function ForgetPassword() {
           padding: 4,
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
           borderRadius: 2,
+          backgroundColor: "white",
         }}
       >
         <Typography variant="h6" gutterBottom>

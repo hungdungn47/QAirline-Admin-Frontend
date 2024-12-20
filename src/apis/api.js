@@ -379,3 +379,24 @@ export const fetchAdminData = async () => {
     throw error;
   }
 };
+
+export const createNewPassword = async (token, newPassword) => {
+  try {
+    const response = await axios.post(
+      "/api/admin/v1/create_new_password",
+      {
+        token: token,
+        password: newPassword,
+      },
+      {
+        baseURL: API_BASE_URL,
+        headers: {
+          "X-auth-token": "QAirline-API-Token",
+        },
+      }
+    );
+    return response.data.message;
+  } catch (error) {
+    throw error;
+  }
+};

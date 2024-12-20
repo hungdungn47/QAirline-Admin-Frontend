@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
+import backgroundImage from "../../../assets/background.jpg";
+import { createNewPassword } from "../../../apis/api";
 
 export default function ResetPassword() {
   const { token } = useParams(); // token from URL
@@ -31,7 +33,8 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      setMessage("Your password has been reset successfully.");
+      const message = await createNewPassword(token, password);
+      setMessage(message);
       navigate("/login");
     } catch (error) {
       setError("Something went wrong. Please try again.");
@@ -40,20 +43,24 @@ export default function ResetPassword() {
     }
   };
 
-  // useEffect(() => {
-  //   if (!token) {
-  //     setError("Invalid or expired link.");
-  //   }
-  // }, [token]);
+  useEffect(() => {
+    if (!token) {
+      setError("Invalid or expired link.");
+    }
+  }, [token]);
 
   return (
-    <div className="h-[100vh] flex items-center justify-center">
+    <div
+      className="h-[100vh] flex items-center justify-center"
+      style={{ background: `url(${backgroundImage})` }}
+    >
       <Box
         sx={{
           maxWidth: 400,
           padding: 4,
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
           borderRadius: 2,
+          backgroundColor: "white",
         }}
       >
         <Typography variant="h6" gutterBottom>
