@@ -169,7 +169,7 @@ export default function Flights() {
         });
       })
       .catch((err) => {
-        toast.error("Failed to create flight.");
+        toast.error("Failed to create flights.");
       });
   };
 
