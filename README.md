@@ -40,11 +40,11 @@ Dự án sử dụng những công nghệ / framework / thư viện sau:
 
 Look and feel của trang web được thiết lập bằng cách đặt lại các màu chủ đề cho theme của tailwind CSS và theme của Material UI.
 
-Tailwind CSS và Material UI được sử dụng với mục đích chính là rút ngắn mã nguồn và thời gian lập trình. Các thuộc tính style của các component gần như đều được viết lại để đảm bảo look and feel của trang web.
+Tailwind CSS và Material UI được sử dụng với mục đích chính là rút ngắn mã nguồn và thời gian lập trình. Các thuộc tính style của các component đều được em viết lại để đảm bảo look and feel của trang web.
 
 ## Cài đặt
 
-Sau khi đã tải và giải nén project này, chạy lệnh sau đây để cài đặt các thư viện của dự án
+Sau khi đã tải và giải nén project này, thầy hãy chạy lệnh sau đây để cài đặt các thư viện của dự án
 
 ```bash
 npm install
@@ -58,10 +58,17 @@ Gõ lệnh sau trong terminal ở directory của dự án để chạy:
 npm run dev
 ```
 
-Truy cập vào trình duyệt tại địa chỉ:
+Sau đó truy cập vào trình duyệt tại địa chỉ:
 
 ```
 http://localhost:5173/
+```
+
+Vì đây là trang web admin nên thầy sẽ không thể tự tạo tài khoản. Thầy có thể dùng tài khoản và mật khẩu sau để đăng nhập:
+
+```
+hungdungn47@gmail.com
+hungdung
 ```
 
 ## Cấu trúc dự án
